@@ -319,6 +319,7 @@
         </form>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
         let currentTab = 'login';
 
@@ -361,7 +362,7 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const response = await fetch('/auth/login', {
+                const response = await fetch(getApiUrl('/auth/login'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -414,7 +415,7 @@
             const password = document.getElementById('signupPassword').value;
 
             try {
-                const response = await fetch('/auth/signup', {
+                const response = await fetch(getApiUrl('/auth/register'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
