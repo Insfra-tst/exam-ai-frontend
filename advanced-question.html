@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Question - AI-Powered Exam Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .question-topic {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .question-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            color: #5a6c7d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 30px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .solve-btn, .answer-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .solve-btn:hover, .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .solution-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .solution-answer {
+            color: #000;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .solution-steps {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .solution-steps h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .solution-steps ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        .solution-steps li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            min-width: 300px;
+        }
+        
+        .loading i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .loading h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .loading p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .question-title {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .solve-btn, .answer-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <a href="/question-predictor.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Question Predictor
+        </a>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-brain"></i>
+                Advanced Question
+            </h1>
+            <p>Detailed analysis and step-by-step solution</p>
+        </div>
+        
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Generating Advanced Question...</h3>
+            <p>Creating detailed solution and analysis</p>
+        </div>
+        
+        <!-- Question Card -->
+        <div id="questionCard" class="question-card hidden">
+            <div class="question-topic" id="questionTopic"></div>
+            <h2 class="question-title" id="questionTitle"></h2>
+            <div class="question-text" id="questionText"></div>
+            
+            <div class="action-buttons">
+                <button class="solve-btn" id="solveBtn" onclick="showSolution()">
+                    <i class="fas fa-calculator"></i>
+                    Solve It
+                </button>
+                <button class="answer-btn" id="answerBtn" onclick="showSolution()">
+                    <i class="fas fa-lightbulb"></i>
+                    Answer It
+                </button>
+            </div>
+        </div>
+        
+        <!-- Solution Container -->
+        <div id="solutionContainer" class="solution-container">
+            <div class="solution-answer" id="solutionAnswer"></div>
+            <div class="solution-steps">
+                <h3>Step-by-Step Solution:</h3>
+                <div id="solutionSteps"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="advanced-question.js"></script>
+</body>
+</html> 

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - Exam Pattern Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: #f8f9fa;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .auth-form {
+            padding: 30px;
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-oauth {
+            background: white;
+            border: 2px solid #e9ecef;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-oauth:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .btn-google {
+            border-color: #db4437;
+            color: #db4437;
+        }
+
+        .btn-google:hover {
+            background: #db4437;
+            color: white;
+        }
+
+        .btn-facebook {
+            border-color: #4267B2;
+            color: #4267B2;
+        }
+
+        .btn-facebook:hover {
+            background: #4267B2;
+            color: white;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e9ecef;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .verification-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your exam analysis dashboard</p>
+        </div>
+
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+            <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form active" id="loginForm">
+            <div id="loginMessage"></div>
+            
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+
+            <a href="/auth/google" class="btn btn-oauth btn-google">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </a>
+
+            <a href="/auth/facebook" class="btn btn-oauth btn-facebook">
+                <i class="fab fa-facebook-f"></i>
+                Continue with Facebook
+            </a>
+        </form>
+
+        <!-- Signup Form -->
+        <form class="auth-form" id="signupForm">
+            <div id="signupMessage"></div>
+            
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+
+            <a href="/auth/google" class="btn btn-oauth btn-google">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </a>
+
+            <a href="/auth/facebook" class="btn btn-oauth btn-facebook">
+                <i class="fab fa-facebook-f"></i>
+                Continue with Facebook
+            </a>
+        </form>
+    </div>
+
+    <script>
+        let currentTab = 'login';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab styling
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update form visibility
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+            
+            // Clear messages
+            document.getElementById('loginMessage').innerHTML = '';
+            document.getElementById('signupMessage').innerHTML = '';
+        }
+
+        function showMessage(formId, message, type = 'error') {
+            const messageDiv = document.getElementById(formId + 'Message');
+            messageDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+        }
+
+        function setLoading(formId, loading) {
+            const form = document.getElementById(formId + 'Form');
+            if (loading) {
+                form.classList.add('loading');
+            } else {
+                form.classList.remove('loading');
+            }
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading('login', true);
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store token and user data
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    
+                    // Store exam data if available
+                    if (data.user.examData) {
+                        localStorage.setItem('examData', JSON.stringify(data.user.examData));
+                    }
+                    
+                    // Store onboarding status
+                    if (data.user.onboardingCompleted) {
+                        localStorage.setItem('onboardingCompleted', 'true');
+                    } else {
+                        localStorage.removeItem('onboardingCompleted');
+                    }
+                    
+                    // Redirect based on onboarding status
+                    if (data.user.onboardingCompleted) {
+                        window.location.href = '/dashboard.html';
+                    } else {
+                        window.location.href = '/onboarding.html';
+                    }
+                } else {
+                    showMessage('login', data.error);
+                }
+            } catch (error) {
+                showMessage('login', 'Network error. Please try again.');
+            } finally {
+                setLoading('login', false);
+            }
+        });
+
+        // Signup form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading('signup', true);
+
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            try {
+                const response = await fetch('/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('signup', data.message, 'success');
+                    document.getElementById('signupForm').reset();
+                } else {
+                    showMessage('signup', data.error);
+                }
+            } catch (error) {
+                showMessage('signup', 'Network error. Please try again.');
+            } finally {
+                setLoading('signup', false);
+            }
+        });
+
+        // Check for auth success parameters (OAuth callback)
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const user = urlParams.get('user');
+
+        if (token && user) {
+            try {
+                const userData = JSON.parse(decodeURIComponent(user));
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                if (userData.onboardingCompleted) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    window.location.href = '/onboarding.html';
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

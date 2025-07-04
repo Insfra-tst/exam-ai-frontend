@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics & Subtopics - Syllabus Table</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .topics-container {
+            background: #fefefe;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .topics-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 20%, #f1c40f 40%, #27ae60 60%, #3498db 80%, #9b59b6 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .topics-header {
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .topics-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .topics-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .topics-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .topics-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .topics-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: top;
+        }
+        
+        .topics-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .topic-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .subtopics-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .subtopics-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            color: #34495e;
+        }
+        
+        .subtopics-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .subtopics-list li::before {
+            content: '•';
+            color: #3498db;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .analysis-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        .analysis-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .analysis-btn i {
+            margin-right: 6px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <i class="fas fa-table"></i>
+                    Topics & Subtopics
+                </h1>
+                <p class="subtitle">Syllabus-Based Topic Analysis</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div style="margin-bottom: 20px;">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </button>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Loading Syllabus Topics...</h3>
+            <p>Generating comprehensive topic and subtopic analysis</p>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Topics Table Section -->
+        <div id="topicsSection" class="topics-container hidden">
+            <div class="topics-header">
+                <h2 class="topics-title" id="topicsTitle">Topics & Subtopics</h2>
+                <p class="topics-subtitle" id="topicsSubtitle">Complete syllabus breakdown with detailed subtopics</p>
+            </div>
+            
+            <table class="topics-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Main Topic</th>
+                        <th style="width: 50%;">Subtopics</th>
+                        <th style="width: 20%;">Analysis</th>
+                    </tr>
+                </thead>
+                <tbody id="topicsTableBody">
+                    <!-- Topics will be generated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="topics.js"></script>
+</body>
+</html> 

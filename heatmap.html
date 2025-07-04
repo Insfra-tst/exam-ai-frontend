@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Heatmap - Exam Pattern Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-exam {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #f8f9fa;
+            border-left-color: #667eea;
+        }
+
+        .nav-item.active {
+            background: #e8ecff;
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #667eea;
+            cursor: pointer;
+            display: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+        }
+
+        .subject-info {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .subject-name {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .exam-info {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .heatmap-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <i class="fas fa-fire"></i>
+            Exam Pattern Analyzer
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name" id="userName">Loading...</div>
+                <div class="user-exam" id="userExam">Loading...</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Navigation</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Student Data</div>
+                <a href="/dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    My Dashboard
+                </a>
+                <a href="/subjects.html" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    All Subjects
+                </a>
+                <a href="/settings.html" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Analysis Tools</div>
+                <a href="/visual-analyzer.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    Visual Analysis
+                </a>
+                <a href="/heatmap.html" class="nav-item active">
+                    <i class="fas fa-fire"></i>
+                    Topic Heatmap
+                </a>
+                <a href="/topic-analysis.html" class="nav-item">
+                    <i class="fas fa-search"></i>
+                    Topic Analysis
+                </a>
+                <a href="/question-predictor.html" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    Question Predictor
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="header-title">Topic Heatmap</h1>
+            <p class="header-subtitle">Visualize topic importance and difficulty patterns</p>
+        </div>
+
+        <div class="subject-info" id="subjectInfo">
+            <div class="loading">Loading subject information...</div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="totalTopics">0</div>
+                <div class="stat-label">Total Topics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgDifficulty">0%</div>
+                <div class="stat-label">Average Difficulty</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="examWeight">0%</div>
+                <div class="stat-label">Exam Weight</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="successRate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+
+        <div class="heatmap-container">
+            <div class="chart-container">
+                <canvas id="heatmapChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = {};
+        let selectedSubject = {};
+        let heatmapChart = null;
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/auth.html';
+                return;
+            }
+        }
+
+        // Load user data
+        async function loadUserData() {
+            try {
+                const response = await fetch('/auth/user', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (response.ok) {
+                    userData = await response.json();
+                    document.getElementById('userName').textContent = userData.name;
+                    document.getElementById('userExam').textContent = userData.examData?.examName || 'No exam set';
+                    loadSubjectData();
+                } else {
+                    window.location.href = '/auth.html';
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                window.location.href = '/auth.html';
+            }
+        }
+
+        // Load subject data
+        function loadSubjectData() {
+            // Get subject from URL parameters or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectFromUrl = urlParams.get('subject');
+            const examFromUrl = urlParams.get('exam');
+            const gradeFromUrl = urlParams.get('grade');
+            const streamFromUrl = urlParams.get('stream');
+            const subjectFromStorage = localStorage.getItem('selectedSubject');
+            
+            if (subjectFromUrl) {
+                selectedSubject = { 
+                    name: decodeURIComponent(subjectFromUrl),
+                    examName: examFromUrl ? decodeURIComponent(examFromUrl) : null,
+                    gradeLevel: gradeFromUrl ? decodeURIComponent(gradeFromUrl) : null,
+                    stream: streamFromUrl ? decodeURIComponent(streamFromUrl) : null
+                };
+            } else if (subjectFromStorage) {
+                selectedSubject = JSON.parse(subjectFromStorage);
+            } else {
+                document.getElementById('subjectInfo').innerHTML = 
+                    '<div class="error">No subject selected. Please select a subject from your dashboard.</div>';
+                return;
+            }
+
+            // Display subject info with exam details
+            const examInfo = selectedSubject.examName || userData.examData?.examName || 'Unknown Exam';
+            const gradeInfo = selectedSubject.gradeLevel || userData.examData?.gradeLevel || '';
+            const streamInfo = selectedSubject.stream || userData.examData?.stream || '';
+            
+            let examDisplay = examInfo;
+            if (gradeInfo) examDisplay += ` (${gradeInfo})`;
+            if (streamInfo) examDisplay += ` - ${streamInfo}`;
+
+            document.getElementById('subjectInfo').innerHTML = `
+                <div class="subject-name">${selectedSubject.name}</div>
+                <div class="exam-info">${examDisplay}</div>
+            `;
+
+            // Generate heatmap data
+            generateHeatmapData();
+        }
+
+        // Generate heatmap data using OpenAI
+        async function generateHeatmapData() {
+            try {
+                const response = await fetch('/auth/generate-subject-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify({
+                        subjectName: selectedSubject.name,
+                        examName: selectedSubject.examName || userData.examData?.examName,
+                        gradeLevel: selectedSubject.gradeLevel || userData.examData?.gradeLevel,
+                        stream: selectedSubject.stream || userData.examData?.stream
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    renderHeatmap(data.analysis);
+                } else {
+                    document.getElementById('heatmap-container').innerHTML = 
+                        '<div class="error">Failed to generate heatmap data</div>';
+                }
+            } catch (error) {
+                console.error('Error generating heatmap data:', error);
+                document.getElementById('heatmap-container').innerHTML = 
+                    '<div class="error">Failed to generate heatmap data</div>';
+            }
+        }
+
+        // Render heatmap
+        function renderHeatmap(analysis) {
+            // Update stats
+            document.getElementById('totalTopics').textContent = analysis.topicVolume || 0;
+            document.getElementById('avgDifficulty').textContent = `${analysis.difficulty || 0}%`;
+            document.getElementById('examWeight').textContent = `${analysis.examWeight || 0}%`;
+            document.getElementById('successRate').textContent = `${analysis.successRate || 0}%`;
+            document.getElementById('statsGrid').style.display = 'grid';
+
+            // Generate sample topic data (in real app, this would come from OpenAI)
+            const topics = generateTopicData(selectedSubject.name, analysis);
+            
+            // Create heatmap chart
+            const ctx = document.getElementById('heatmapChart').getContext('2d');
+            
+            if (heatmapChart) {
+                heatmapChart.destroy();
+            }
+
+            heatmapChart = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Topic Importance',
+                        data: topics.map(topic => ({
+                            x: topic.difficulty,
+                            y: topic.importance,
+                            r: topic.frequency * 2
+                        })),
+                        backgroundColor: topics.map(topic => topic.color),
+                        borderColor: topics.map(topic => topic.color),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Topic Heatmap - Difficulty vs Importance',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const topic = topics[context.dataIndex];
+                                    return [
+                                        `Topic: ${topic.name}`,
+                                        `Difficulty: ${topic.difficulty}%`,
+                                        `Importance: ${topic.importance}%`,
+                                        `Frequency: ${topic.frequency}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Difficulty Level (%)'
+                            },
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Importance Level (%)'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Generate sample topic data
+        function generateTopicData(subjectName, analysis) {
+            const baseTopics = {
+                'Mathematics': ['Algebra', 'Geometry', 'Trigonometry', 'Calculus', 'Statistics', 'Probability'],
+                'Physics': ['Mechanics', 'Thermodynamics', 'Electromagnetism', 'Optics', 'Modern Physics'],
+                'Chemistry': ['Organic Chemistry', 'Inorganic Chemistry', 'Physical Chemistry', 'Analytical Chemistry'],
+                'Biology': ['Cell Biology', 'Genetics', 'Ecology', 'Evolution', 'Human Physiology'],
+                'English': ['Grammar', 'Literature', 'Comprehension', 'Writing', 'Vocabulary']
+            };
+
+            const topics = baseTopics[subjectName] || ['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5'];
+            
+            return topics.map((topic, index) => ({
+                name: topic,
+                difficulty: Math.floor(Math.random() * 40) + 30, // 30-70%
+                importance: Math.floor(Math.random() * 40) + 40, // 40-80%
+                frequency: Math.floor(Math.random() * 30) + 20, // 20-50%
+                color: `hsl(${index * 60}, 70%, 60%)`
+            }));
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        // Close sidebar when clicking overlay
+        document.getElementById('overlay').addEventListener('click', toggleSidebar);
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('selectedSubject');
+            window.location.href = '/auth.html';
+        }
+
+        // Initialize
+        checkAuth();
+        loadUserData();
+    </script>
+</body>
+</html> 

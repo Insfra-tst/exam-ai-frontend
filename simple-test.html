@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Visual Analyzer Test</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .chart { width: 100%; height: 400px; margin: 20px 0; }
+        .status { padding: 10px; margin: 10px 0; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Visual Analyzer Test</h1>
+        
+        <div class="status" id="status">Ready to test...</div>
+        
+        <div>
+            <button onclick="testBasicAPI()">Test Basic API</button>
+            <button onclick="testChart()">Test Chart</button>
+            <button onclick="testFunctions()">Test Functions</button>
+        </div>
+        
+        <div id="chart" class="chart"></div>
+        
+        <div id="output"></div>
+    </div>
+    
+    <script>
+        let testData = null;
+        
+        function log(message) {
+            console.log(message);
+            document.getElementById('status').innerHTML = message;
+            document.getElementById('output').innerHTML += '<div>' + message + '</div>';
+        }
+        
+        async function testBasicAPI() {
+            log('Testing basic API...');
+            try {
+                const response = await fetch('/api/generate-visual-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ examType: 'SAT', subject: 'Math' })
+                });
+                
+                const data = await response.json();
+                log(`API Response: ${data.success ? 'SUCCESS' : 'FAILED'}`);
+                
+                if (data.success) {
+                    testData = data.visualData;
+                    log(`Data loaded: ${testData.mainHotspots.length} topics`);
+                } else {
+                    log(`API Error: ${data.error}`);
+                }
+            } catch (error) {
+                log(`Network Error: ${error.message}`);
+            }
+        }
+        
+        function testChart() {
+            if (!testData) {
+                log('No data available. Run API test first.');
+                return;
+            }
+            
+            log('Testing chart rendering...');
+            try {
+                const chartData = [{
+                    values: testData.mainHotspots.map(item => item.percentage),
+                    labels: testData.mainHotspots.map(item => item.topic),
+                    type: 'pie',
+                    hole: 0.4
+                }];
+                
+                const layout = {
+                    title: 'Test Pie Chart',
+                    height: 400
+                };
+                
+                Plotly.newPlot('chart', chartData, layout);
+                log('Chart rendered successfully!');
+            } catch (error) {
+                log(`Chart Error: ${error.message}`);
+            }
+        }
+        
+        function testFunctions() {
+            log('Testing if functions are available...');
+            
+            // Check if the visual analyzer script loaded
+            if (typeof window.highlightTopTopics === 'function') {
+                log('✅ highlightTopTopics function is available');
+            } else {
+                log('❌ highlightTopTopics function is NOT available');
+            }
+            
+            if (typeof window.showEasyWins === 'function') {
+                log('✅ showEasyWins function is available');
+            } else {
+                log('❌ showEasyWins function is NOT available');
+            }
+            
+            if (typeof window.testVisualAnalyzer === 'function') {
+                log('✅ testVisualAnalyzer function is available');
+            } else {
+                log('❌ testVisualAnalyzer function is NOT available');
+            }
+        }
+        
+        // Load the visual analyzer script
+        const script = document.createElement('script');
+        script.src = 'visual-analyzer.js';
+        script.onload = function() {
+            log('✅ Visual Analyzer script loaded successfully');
+        };
+        script.onerror = function() {
+            log('❌ Failed to load visual-analyzer.js');
+        };
+        document.head.appendChild(script);
+        
+        log('Page loaded, script loading...');
+    </script>
+</body>
+</html> 

@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" onload="console.log('Plotly loaded successfully')" onerror="console.error('Failed to load Plotly')"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/auth.html';
+                return;
+            }
+
+            // Check if user has exam data (either from server or localStorage)
+            const examData = localStorage.getItem('examData');
+            if (!examData) {
+                // Try to get from server
+                fetch('/auth/user', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.user || !data.user.examData) {
+                        window.location.href = '/onboarding.html';
+                        return;
+                    }
+                })
+                .catch(() => {
+                    window.location.href = '/onboarding.html';
+                    return;
+                });
+            }
+        }
+
+        // Check authentication on page load
+        checkAuth();
+
+        // Ensure jsPDF is available globally
+        window.jspdf = window.jspdf || {};
+        if (typeof window.jspdf.jsPDF === 'undefined' && typeof jsPDF !== 'undefined') {
+            window.jspdf.jsPDF = jsPDF;
+        }
+        
+        // Additional fallback for jsPDF
+        if (typeof window.jspdf.jsPDF === 'undefined' && typeof window.jsPDF !== 'undefined') {
+            window.jspdf.jsPDF = window.jsPDF;
+        }
+        
+        console.log('jsPDF setup complete:', {
+            'window.jspdf': !!window.jspdf,
+            'window.jspdf.jsPDF': !!window.jspdf.jsPDF,
+            'typeof jsPDF': typeof jsPDF,
+            'typeof window.jsPDF': typeof window.jsPDF
+        });
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-logo i {
+            color: #3498db;
+        }
+        
+        .sidebar-subtitle {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-section-title {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item-text {
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .nav-menu {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .nav-logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-items {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-item i {
+            font-size: 0.9rem;
+        }
+        
+        .visual-analyzer-container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .visual-analyzer-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .visual-analyzer-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .visual-analyzer-subtitle {
+            color: #7f8c8d;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+        
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1200px;
+            min-height: 600px;
+        }
+        
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .chart-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .chart-title i {
+            font-size: 1.4rem;
+            color: #667eea;
+        }
+        
+        .chart-description {
+            color: #7f8c8d;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .chart-content {
+            height: 600px;
+            position: relative;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
+            width: 100%;
+        }
+        
+        .chart-content .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .chart-content .loading.hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .loading p {
+            margin: 0;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 40px 30px 40px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .breadcrumb::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            z-index: -1;
+        }
+        
+        .breadcrumb-item {
+            color: #5a6c7d;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .breadcrumb-item:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .breadcrumb-item.active {
+            color: #2c3e50;
+            font-weight: 700;
+            background: rgba(44, 62, 80, 0.1);
+        }
+        
+        .breadcrumb-separator {
+            color: #bdc3c7;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Pointer Events Section - Enhanced Creative Design */
+        .pointer-events-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 30px;
+            margin: 40px 0;
+            border-radius: 25px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+        
+        .pointer-events-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .pointer-events-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pointer-events-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .pointer-events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .pointer-event-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pointer-event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .pointer-event-card:hover::before {
+            left: 100%;
+        }
+        
+        .pointer-event-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .pointer-event-card:active {
+            transform: translateY(-4px) scale(0.98);
+        }
+        
+        .pointer-event-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .pointer-event-card:hover .pointer-event-icon {
+            transform: scale(1.1) rotate(5deg);
+            color: #fff;
+        }
+        
+        .pointer-event-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pointer-event-description {
+            font-size: 1rem;
+            opacity: 0.95;
+            line-height: 1.6;
+            color: #f0f0f0;
+        }
+        
+        /* Special styling for debug buttons */
+        .pointer-event-card[data-action*="test"],
+        .pointer-event-card[data-action*="debug"],
+        .pointer-event-card[data-action*="cache"] {
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .pointer-event-card[data-action*="test"]:hover,
+        .pointer-event-card[data-action*="debug"]:hover,
+        .pointer-event-card[data-action*="cache"]:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Chart indicators */
+        .chart-indicators {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-radius: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .chart-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2c3e50;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .chart-indicator:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-indicator-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        .chart-indicator-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        /* Enhanced Responsive Design */
+        @media (max-width: 1400px) {
+            .visual-analyzer-container {
+                padding: 25px 20px;
+            }
+            
+            .chart-container {
+                max-width: 1100px;
+                padding: 25px;
+            }
+            
+            .visual-analyzer-title {
+                font-size: 2.8rem;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .pointer-events-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 18px;
+            }
+            
+            .chart-container {
+                max-width: 100%;
+                padding: 25px;
+                min-height: 550px;
+            }
+            
+            .chart-content {
+                height: 450px;
+                min-height: 450px;
+            }
+            
+            .visual-analyzer-title {
+                font-size: 2.5rem;
+            }
+            
+            .visual-analyzer-subtitle {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+            }
+            
+            .chart-container {
+                padding: 20px;
+                min-height: 500px;
+            }
+            
+            .chart-content {
+                height: 400px;
+                min-height: 400px;
+            }
+            
+            .pointer-events-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 15px;
+            }
+            
+            .visual-analyzer-title {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 280px;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .visual-analyzer-title {
+                font-size: 2rem;
+            }
+            
+            .visual-analyzer-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .chart-container {
+                padding: 20px;
+                min-height: 450px;
+                border-radius: 15px;
+            }
+            
+            .chart-content {
+                height: 380px;
+                min-height: 380px;
+            }
+            
+            .pointer-events-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            
+            .pointer-events-section {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+            
+            .visual-analyzer-container {
+                padding: 20px 15px;
+                min-height: calc(100vh - 150px);
+            }
+            
+            .breadcrumb {
+                margin: 15px 20px 20px 20px;
+                padding: 12px 18px;
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+            
+            .chart-title {
+                font-size: 1.4rem;
+            }
+            
+            .chart-description {
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .visual-analyzer-title {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+            
+            .visual-analyzer-subtitle {
+                font-size: 1rem;
+                margin-bottom: 15px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+                min-height: 400px;
+                border-radius: 12px;
+            }
+            
+            .chart-content {
+                height: 320px;
+                min-height: 320px;
+            }
+            
+            .pointer-events-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .pointer-events-section {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+            
+            .pointer-events-title {
+                font-size: 1.6rem;
+            }
+            
+            .pointer-event-card {
+                padding: 20px;
+                border-radius: 12px;
+            }
+            
+            .pointer-event-icon {
+                font-size: 2.2rem;
+            }
+            
+            .pointer-event-title {
+                font-size: 1.1rem;
+            }
+            
+            .pointer-event-description {
+                font-size: 0.85rem;
+            }
+            
+            .visual-analyzer-container {
+                padding: 15px 10px;
+            }
+            
+            .breadcrumb {
+                margin: 10px 15px 15px 15px;
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+            
+            .chart-title {
+                font-size: 1.3rem;
+            }
+            
+            .chart-description {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .visual-analyzer-title {
+                font-size: 1.6rem;
+            }
+            
+            .chart-container {
+                padding: 12px;
+                min-height: 350px;
+            }
+            
+            .chart-content {
+                height: 280px;
+                min-height: 280px;
+            }
+            
+            .pointer-event-card {
+                padding: 15px;
+            }
+            
+            .pointer-event-icon {
+                font-size: 1.8rem;
+            }
+            
+            .pointer-event-title {
+                font-size: 1rem;
+            }
+            
+            .pointer-event-description {
+                font-size: 0.8rem;
+            }
+            
+            .visual-analyzer-container {
+                padding: 10px 8px;
+            }
+            
+            .breadcrumb {
+                margin: 8px 12px 12px 12px;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .visual-analyzer-container {
+                padding: 15px;
+            }
+            
+            .chart-container {
+                min-height: 300px;
+                padding: 15px;
+            }
+            
+            .chart-content {
+                height: 250px;
+                min-height: 250px;
+            }
+            
+            .pointer-events-section {
+                padding: 15px;
+            }
+            
+            .pointer-events-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 10px;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .chart-container {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            }
+            
+            .pointer-event-card {
+                border: 0.5px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        /* Smooth scrolling for better UX */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Better focus states for accessibility */
+        .pointer-event-card:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        .menu-item:focus {
+            outline: 2px solid #3498db;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-fire"></i>
+                Exam AI
+            </div>
+            <div class="sidebar-subtitle">AI-Powered Exam Analysis</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Student Data</div>
+                <a href="/dashboard.html" class="menu-item">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="menu-item-text">My Dashboard</span>
+                </a>
+                <a href="/subjects.html" class="menu-item" id="allSubjectsLink">
+                    <i class="fas fa-book"></i>
+                    <span class="menu-item-text">All Subjects</span>
+                </a>
+                <a href="/settings.html" class="menu-item" id="settingsLink">
+                    <i class="fas fa-cog"></i>
+                    <span class="menu-item-text">Settings</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Analysis Tools</div>
+                <a href="/heatmap.html" class="menu-item">
+                    <i class="fas fa-fire"></i>
+                    <span class="menu-item-text">Topic Heatmap</span>
+                </a>
+                <a href="/visual-analyzer.html" class="menu-item active">
+                    <i class="fas fa-microscope"></i>
+                    <span class="menu-item-text">Visual Analyzer</span>
+                </a>
+                <a href="/question-predictor.html" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Question Predictor</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-trophy"></i>
+                    <span class="menu-item-text">Easy Score</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Learning Tools</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="menu-item-text">Easy Learn</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="menu-item-text">Quick Notes</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">AI Assistance</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="menu-item-text">AI Feedback Engine</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Ask Doubt AI</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/" class="breadcrumb-item">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <span class="breadcrumb-item active">
+                <i class="fas fa-microscope"></i>
+                Visual Analyzer
+            </span>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading hidden">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Generating Visual Analysis...</h3>
+            <p>Creating interactive charts and visualizations based on exam patterns</p>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Visual Analyzer Content -->
+        <div id="visualAnalyzerSection" class="visual-analyzer-container hidden">
+            <div class="visual-analyzer-header">
+                <h1 class="visual-analyzer-title">Visual Analyzer</h1>
+                <p class="visual-analyzer-subtitle" id="analyzerSubtitle">Interactive data visualizations for exam preparation</p>
+            </div>
+            
+            <!-- Charts Container -->
+            <div class="charts-container">
+                <!-- 1. Pie Chart - Main Hotspots -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Main Hotspots (by Topic)
+                        </div>
+                    </div>
+                    <div class="chart-description">
+                        This pie chart shows the distribution of main topics based on their prediction percentages. 
+                        Each slice represents how frequently a topic appears in exams, helping you prioritize your study focus.
+                    </div>
+                    <div class="chart-content" id="pieChart">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading pie chart...
+                        </div>
+                    </div>
+                    
+                    <!-- Chart indicators -->
+                    <div class="chart-indicators" id="pieChartIndicators">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- 2. Quadrant Graph Visualizer -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-th"></i>
+                            Topic Weight vs Hotspot Score
+                        </div>
+                    </div>
+                    <div class="chart-description">
+                        This quadrant analysis shows the relationship between topic weight (syllabus coverage) and hotspot score (exam frequency). 
+                        Topics in the top-right quadrant are both important and frequently tested.
+                    </div>
+                    <div class="chart-content" id="quadrantChart">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading quadrant chart...
+                        </div>
+                    </div>
+                    
+                    <!-- Chart indicators -->
+                    <div class="chart-indicators" id="quadrantChartIndicators">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- 3. Dual Axis Bar Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Easy-to-Learn Hotspots
+                        </div>
+                    </div>
+                    <div class="chart-description">
+                        This dual-axis chart compares hotspot scores (exam frequency) with easy scores (learning difficulty). 
+                        Topics with high hotspot scores and high easy scores are your best study targets.
+                    </div>
+                    <div class="chart-content" id="dualAxisChart">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading dual axis chart...
+                        </div>
+                    </div>
+                    
+                    <!-- Chart indicators -->
+                    <div class="chart-indicators" id="dualAxisChartIndicators">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- 4. Bubble Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-circle"></i>
+                            Hotspot vs Ease Analysis
+                        </div>
+                    </div>
+                    <div class="chart-description">
+                        This bubble chart visualizes topics by ease of learning (X-axis), hotspot score (Y-axis), and importance (bubble size). 
+                        Larger bubbles in the top-right represent the most valuable study topics.
+                    </div>
+                    <div class="chart-content" id="bubbleChart">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading bubble chart...
+                        </div>
+                    </div>
+                    
+                    <!-- Chart indicators -->
+                    <div class="chart-indicators" id="bubbleChartIndicators">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- 5. Comparison Visualizer - Subject Difficulty -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-balance-scale"></i>
+                            <span id="comparisonChartTitle">Subject Difficulty Comparison</span>
+                        </div>
+                    </div>
+                    <div class="chart-description">
+                        This chart compares the difficulty level of your selected subject against other subjects in the same exam. 
+                        It helps you understand the relative complexity of your subject.
+                    </div>
+                    <div class="chart-content" id="comparisonChart">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading comparison chart...
+                        </div>
+                    </div>
+                    
+                    <!-- Chart indicators -->
+                    <div class="chart-indicators" id="comparisonChartIndicators">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- 6. Syllabus Size Comparison -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fas fa-book"></i>
+                            Syllabus Size Comparison
+                        </div>
+                    </div>
+                    <div class="chart-description">
+                        This chart shows the syllabus size (topic volume) comparison between your subject and other subjects in the exam. 
+                        Larger syllabus means more topics to cover.
+                    </div>
+                    <div class="chart-content" id="syllabusChart">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading syllabus chart...
+                        </div>
+                    </div>
+                    
+                    <!-- Chart indicators -->
+                    <div class="chart-indicators" id="syllabusChartIndicators">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pointer Events Section -->
+            <div class="pointer-events-section">
+                <h2 class="pointer-events-title">Key Insights & Actions</h2>
+                <p class="pointer-events-subtitle">Click on any card below to explore interactive features and get personalized insights</p>
+                <div class="pointer-events-grid">
+                    <div class="pointer-event-card" data-action="highlightTopTopics">
+                        <div class="pointer-event-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="pointer-event-title">Top Priority Topics</div>
+                        <div class="pointer-event-description">Identify and focus on the highest-scoring topics for maximum exam success</div>
+                    </div>
+                    
+                    <div class="pointer-event-card" data-action="showEasyWins">
+                        <div class="pointer-event-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="pointer-event-title">Easy Wins</div>
+                        <div class="pointer-event-description">Find topics that are both easy to learn and frequently tested</div>
+                    </div>
+                    
+                    <div class="pointer-event-card" data-action="analyzeWeakAreas">
+                        <div class="pointer-event-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="pointer-event-title">Weak Areas</div>
+                        <div class="pointer-event-description">Identify topics that need more attention and practice</div>
+                    </div>
+                    
+                    <div class="pointer-event-card" data-action="generateStudyPlan">
+                        <div class="pointer-event-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="pointer-event-title">Study Plan</div>
+                        <div class="pointer-event-description">Create a personalized study schedule based on topic priorities</div>
+                    </div>
+                    
+                    <div class="pointer-event-card" data-action="compareSubjects">
+                        <div class="pointer-event-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="pointer-event-title">Subject Comparison</div>
+                        <div class="pointer-event-description">Compare performance across different subjects and topics</div>
+                    </div>
+                    
+                    <div class="pointer-event-card" data-action="exportAnalysis">
+                        <div class="pointer-event-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="pointer-event-title">Export Analysis</div>
+                        <div class="pointer-event-description">Download your complete analysis report for offline study</div>
+                    </div>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="visual-analyzer.js"></script>
+    <script>
+        console.log('Visual Analyzer HTML loaded');
+        
+        // Add functionality to sidebar links
+        document.addEventListener('DOMContentLoaded', function() {
+            // All Subjects link
+            const allSubjectsLink = document.getElementById('allSubjectsLink');
+            if (allSubjectsLink) {
+                allSubjectsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    if (userData.examData && userData.examData.selectedSubjects) {
+                        alert('Your subjects:\n\n' + userData.examData.selectedSubjects.join('\n'));
+                    } else {
+                        alert('No subjects found. Please complete your onboarding first.');
+                    }
+                });
+            }
+            
+            // Settings link
+            const settingsLink = document.getElementById('settingsLink');
+            if (settingsLink) {
+                settingsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const settings = `
+User Settings:
+- Name: ${userData.name || 'Not set'}
+- Email: ${userData.email || 'Not set'}
+- Exam: ${userData.examData?.examName || 'Not set'}
+- Grade: ${userData.examData?.gradeLevel || 'Not set'}
+- Subjects: ${userData.examData?.selectedSubjects?.length || 0} subjects
+
+To change settings, please contact support.
+                    `;
+                    alert(settings);
+                });
+            }
+        });
+        
+        // Immediate DOM check
+        console.log('=== IMMEDIATE DOM CHECK ===');
+        console.log('loadingSection:', document.getElementById('loadingSection'));
+        console.log('visualAnalyzerSection:', document.getElementById('visualAnalyzerSection'));
+        console.log('analyzerSubtitle:', document.getElementById('analyzerSubtitle'));
+        console.log('pieChart:', document.getElementById('pieChart'));
+        console.log('quadrantChart:', document.getElementById('quadrantChart'));
+        console.log('dualAxisChart:', document.getElementById('dualAxisChart'));
+        console.log('bubbleChart:', document.getElementById('bubbleChart'));
+        console.log('comparisonChart:', document.getElementById('comparisonChart'));
+        
+        // Debug DOM elements after script loads
+        setTimeout(() => {
+            console.log('=== DELAYED DOM DEBUG CHECK ===');
+            console.log('loadingSection:', document.getElementById('loadingSection'));
+            console.log('visualAnalyzerSection:', document.getElementById('visualAnalyzerSection'));
+            console.log('analyzerSubtitle:', document.getElementById('analyzerSubtitle'));
+            console.log('pieChart:', document.getElementById('pieChart'));
+            console.log('quadrantChart:', document.getElementById('quadrantChart'));
+            console.log('dualAxisChart:', document.getElementById('dualAxisChart'));
+            console.log('bubbleChart:', document.getElementById('bubbleChart'));
+            console.log('comparisonChart:', document.getElementById('comparisonChart'));
+            
+            // Test if functions are available
+            console.log('Functions available:');
+            console.log('highlightTopTopics:', typeof highlightTopTopics);
+            console.log('showEasyWins:', typeof showEasyWins);
+            console.log('testVisualAnalyzer:', typeof testVisualAnalyzer);
+            console.log('testButton:', typeof testButton);
+            
+            // Test if we can call functions
+            if (typeof testButton === 'function') {
+                console.log('✅ testButton function is available');
+            } else {
+                console.log('❌ testButton function is NOT available');
+            }
+        }, 2000);
+    </script>
+</body>
+</html> 

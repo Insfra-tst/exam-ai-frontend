@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding - Exam Pattern Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .onboarding-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .onboarding-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .onboarding-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .onboarding-header p {
+            opacity: 0.9;
+            font-size: 18px;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 10px;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .progress-step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .onboarding-content {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .step-description {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .subject-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .subject-card.selected {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .subject-card.mandatory {
+            border-color: #dc3545;
+            background: #fff8f8;
+        }
+
+        .subject-type {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .subject-card.mandatory .subject-type {
+            color: #dc3545;
+        }
+
+        .subject-card.optional .subject-type {
+            color: #28a745;
+        }
+
+        .subject-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .subject-description {
+            color: #6c757d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .subject-details {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .fallback-notice {
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+        }
+
+        .exam-suggestions {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .suggestion-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="onboarding-header">
+            <h1>Welcome to Exam Pattern Analyzer</h1>
+            <p>Let's set up your exam profile to get started</p>
+            
+            <div class="progress-bar">
+                <div class="progress-step active" id="step1-indicator">1</div>
+                <div class="progress-step" id="step2-indicator">2</div>
+                <div class="progress-step" id="step3-indicator">3</div>
+            </div>
+        </div>
+
+        <div class="onboarding-content">
+            <!-- Step 1: Exam Selection -->
+            <div class="step active" id="step1">
+                <h2 class="step-title">Choose Your Exam</h2>
+                <p class="step-description">Enter the name of the exam you're preparing for</p>
+                
+                <div id="step1Message"></div>
+                
+                <div class="form-group">
+                    <label for="examName">Exam Name *</label>
+                    <input type="text" id="examName" placeholder="e.g., SAT, ACT, JEE, NEET, Sri Lanka A/L" required>
+                </div>
+
+                <div class="exam-suggestions" id="examSuggestions" style="display: none;">
+                    <h4>Popular Exams:</h4>
+                    <div class="suggestion-item" onclick="selectExam('SAT')">SAT (Scholastic Assessment Test)</div>
+                    <div class="suggestion-item" onclick="selectExam('ACT')">ACT (American College Testing)</div>
+                    <div class="suggestion-item" onclick="selectExam('JEE')">JEE (Joint Entrance Examination)</div>
+                    <div class="suggestion-item" onclick="selectExam('NEET')">NEET (National Eligibility cum Entrance Test)</div>
+                    <div class="suggestion-item" onclick="selectExam('Sri Lanka A/L')">Sri Lanka A/L (Advanced Level)</div>
+                    <div class="suggestion-item" onclick="selectExam('PSAT/NMSQT')">PSAT/NMSQT</div>
+                </div>
+
+                <button class="btn btn-primary" onclick="validateExam()">
+                    <span id="validateBtnText">Validate Exam</span>
+                </button>
+            </div>
+
+            <!-- Step 2: Grade and Stream Selection -->
+            <div class="step" id="step2">
+                <h2 class="step-title">Grade Level & Stream</h2>
+                <p class="step-description">Select your grade level and stream (if applicable)</p>
+                
+                <div id="step2Message"></div>
+                
+                <div class="form-group">
+                    <label for="gradeLevel">Grade Level</label>
+                    <select id="gradeLevel">
+                        <option value="">Select Grade Level</option>
+                        <option value="9th Grade">9th Grade</option>
+                        <option value="10th Grade">10th Grade</option>
+                        <option value="11th Grade">11th Grade</option>
+                        <option value="12th Grade">12th Grade</option>
+                        <option value="Undergraduate">Undergraduate</option>
+                        <option value="Graduate">Graduate</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="stream">Stream (Optional)</label>
+                    <select id="stream">
+                        <option value="">Select Stream</option>
+                        <option value="Science">Science</option>
+                        <option value="Commerce">Commerce</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Medical">Medical</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-secondary" onclick="previousStep()">Previous</button>
+                <button class="btn btn-primary" onclick="getSubjects()">
+                    <span id="subjectsBtnText">Get Subjects</span>
+                </button>
+            </div>
+
+            <!-- Step 3: Subject Selection -->
+            <div class="step" id="step3">
+                <h2 class="step-title">Select Your Subjects</h2>
+                <p class="step-description">Choose the subjects you want to analyze</p>
+                
+                <div id="step3Message"></div>
+                
+                <div id="subjectsContainer">
+                    <p>Loading subjects...</p>
+                </div>
+
+                <button class="btn btn-secondary" onclick="previousStep()">Previous</button>
+                <button class="btn btn-primary" onclick="completeOnboarding()">
+                    <span id="completeBtnText">Complete Onboarding</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let examData = {};
+        let fallbackMode = false;
+
+        // Fallback exam data
+        const fallbackExamData = {
+            'SAT': {
+                mandatorySubjects: [
+                    { name: 'Reading and Writing', description: 'Critical reading and writing skills', weightage: '50%', duration: '65 min' },
+                    { name: 'Math', description: 'Mathematical reasoning and problem solving', weightage: '50%', duration: '80 min' }
+                ],
+                optionalSubjects: [
+                    { name: 'Essay', description: 'Optional essay writing section', weightage: '0%', duration: '50 min' }
+                ]
+            },
+            'ACT': {
+                mandatorySubjects: [
+                    { name: 'English', description: 'Usage and mechanics, rhetorical skills', weightage: '25%', duration: '45 min' },
+                    { name: 'Math', description: 'Pre-algebra, elementary algebra, geometry, trigonometry', weightage: '25%', duration: '60 min' },
+                    { name: 'Reading', description: 'Reading comprehension', weightage: '25%', duration: '35 min' },
+                    { name: 'Science', description: 'Data representation, scientific investigation', weightage: '25%', duration: '35 min' }
+                ],
+                optionalSubjects: [
+                    { name: 'Writing', description: 'Optional writing test', weightage: '0%', duration: '40 min' }
+                ]
+            },
+            'JEE': {
+                mandatorySubjects: [
+                    { name: 'Physics', description: 'Mechanics, thermodynamics, electromagnetism', weightage: '33.33%', duration: '3 hours' },
+                    { name: 'Chemistry', description: 'Physical, organic, and inorganic chemistry', weightage: '33.33%', duration: '3 hours' },
+                    { name: 'Mathematics', description: 'Algebra, calculus, geometry, trigonometry', weightage: '33.33%', duration: '3 hours' }
+                ],
+                optionalSubjects: []
+            },
+            'NEET': {
+                mandatorySubjects: [
+                    { name: 'Physics', description: 'Mechanics, thermodynamics, optics', weightage: '25%', duration: '3 hours' },
+                    { name: 'Chemistry', description: 'Physical, organic, and inorganic chemistry', weightage: '25%', duration: '3 hours' },
+                    { name: 'Biology', description: 'Botany and zoology', weightage: '50%', duration: '3 hours' }
+                ],
+                optionalSubjects: []
+            },
+            'Sri Lanka A/L': {
+                mandatorySubjects: [
+                    { name: 'Sinhala', description: 'Sinhala language and literature', weightage: '25%', duration: '3 hours' },
+                    { name: 'English', description: 'English language and literature', weightage: '25%', duration: '3 hours' }
+                ],
+                optionalSubjects: [
+                    { name: 'Mathematics', description: 'Advanced mathematics', weightage: '25%', duration: '3 hours' },
+                    { name: 'Physics', description: 'Advanced physics', weightage: '25%', duration: '3 hours' },
+                    { name: 'Chemistry', description: 'Advanced chemistry', weightage: '25%', duration: '3 hours' },
+                    { name: 'Biology', description: 'Advanced biology', weightage: '25%', duration: '3 hours' },
+                    { name: 'Economics', description: 'Advanced economics', weightage: '25%', duration: '3 hours' },
+                    { name: 'History', description: 'Advanced history', weightage: '25%', duration: '3 hours' }
+                ]
+            }
+        };
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/auth.html';
+                return;
+            }
+        }
+
+        // Show step
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            
+            // Show current step
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // Update progress indicators
+            document.querySelectorAll('.progress-step').forEach((indicator, index) => {
+                indicator.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    indicator.classList.add('completed');
+                } else if (index + 1 === step) {
+                    indicator.classList.add('active');
+                }
+            });
+        }
+
+        // Show message
+        function showMessage(stepId, message, type = 'error') {
+            const messageDiv = document.getElementById(`${stepId}Message`);
+            const className = type === 'success' ? 'success-message' : 
+                             type === 'warning' ? 'warning-message' : 'error-message';
+            
+            messageDiv.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        // Set loading state
+        function setLoading(stepId, loading) {
+            const btn = document.querySelector(`#${stepId} .btn-primary`);
+            const btnText = btn.querySelector('span');
+            
+            if (loading) {
+                btn.disabled = true;
+                btnText.innerHTML = '<span class="loading"></span>Loading...';
+            } else {
+                btn.disabled = false;
+                btnText.textContent = stepId === 'step1' ? 'Validate Exam' : 
+                                    stepId === 'step2' ? 'Get Subjects' : 'Complete Onboarding';
+            }
+        }
+
+        // Select exam from suggestions
+        function selectExam(examName) {
+            document.getElementById('examName').value = examName;
+            document.getElementById('examSuggestions').style.display = 'none';
+        }
+
+        // Validate exam
+        async function validateExam() {
+            const examName = document.getElementById('examName').value.trim();
+            
+            if (!examName) {
+                showMessage('step1', 'Please enter an exam name');
+                return;
+            }
+
+            setLoading('step1', true);
+            document.getElementById('step1Message').innerHTML = '';
+
+            try {
+                // First try to get exam info from server
+                const response = await fetch('/auth/onboarding/validate-exam', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify({ examName })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    examData.examName = examName;
+                    examData.examInfo = data;
+                    
+                    showMessage('step1', 'Exam validated successfully!', 'success');
+                    currentStep = 2;
+                    showStep(2);
+                } else {
+                    // Fallback to local data
+                    await useFallbackData(examName);
+                }
+            } catch (error) {
+                console.log('Server error, using fallback data:', error);
+                await useFallbackData(examName);
+            } finally {
+                setLoading('step1', false);
+            }
+        }
+
+        // Use fallback data
+        async function useFallbackData(examName) {
+            fallbackMode = true;
+            
+            // Find matching exam in fallback data
+            const matchingExam = Object.keys(fallbackExamData).find(key => 
+                key.toLowerCase().includes(examName.toLowerCase()) || 
+                examName.toLowerCase().includes(key.toLowerCase())
+            );
+
+            if (matchingExam) {
+                examData.examName = matchingExam;
+                examData.examInfo = { name: matchingExam, valid: true };
+                
+                showMessage('step1', `Using fallback data for ${matchingExam}. Some features may be limited.`, 'warning');
+                currentStep = 2;
+                showStep(2);
+            } else {
+                // Create generic exam data
+                examData.examName = examName;
+                examData.examInfo = { name: examName, valid: true };
+                
+                showMessage('step1', `Using generic data for ${examName}. You can customize subjects later.`, 'warning');
+                currentStep = 2;
+                showStep(2);
+            }
+        }
+
+        // Get subjects
+        async function getSubjects() {
+            const gradeLevel = document.getElementById('gradeLevel').value;
+            const stream = document.getElementById('stream').value;
+
+            examData.gradeLevel = gradeLevel;
+            examData.stream = stream;
+
+            setLoading('step2', true);
+            document.getElementById('step2Message').innerHTML = '';
+
+            try {
+                if (fallbackMode) {
+                    // Use fallback data
+                    await loadFallbackSubjects();
+                } else {
+                    // Try to get subjects from server
+                    const response = await fetch('/auth/onboarding/get-comprehensive-subjects', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            examName: examData.examName,
+                            gradeLevel: examData.gradeLevel,
+                            stream: examData.stream
+                        })
+                    });
+
+                    if (response.ok) {
+                        const subjectsData = await response.json();
+                        examData.subjects = subjectsData;
+                        displaySubjects();
+                    } else {
+                        // Fallback to local data
+                        await loadFallbackSubjects();
+                    }
+                }
+                
+                currentStep = 3;
+                showStep(3);
+            } catch (error) {
+                console.log('Error getting subjects, using fallback:', error);
+                await loadFallbackSubjects();
+                currentStep = 3;
+                showStep(3);
+            } finally {
+                setLoading('step2', false);
+            }
+        }
+
+        // Load fallback subjects
+        async function loadFallbackSubjects() {
+            const fallbackData = fallbackExamData[examData.examName];
+            
+            if (fallbackData) {
+                examData.subjects = fallbackData;
+                showMessage('step2', 'Using fallback subject data. You can customize this later.', 'warning');
+            } else {
+                // Create generic subjects
+                examData.subjects = {
+                    mandatorySubjects: [
+                        { name: 'Core Subject 1', description: 'Primary subject for this exam', weightage: '50%', duration: '2 hours' },
+                        { name: 'Core Subject 2', description: 'Secondary subject for this exam', weightage: '50%', duration: '2 hours' }
+                    ],
+                    optionalSubjects: [
+                        { name: 'Optional Subject 1', description: 'Additional subject option', weightage: '25%', duration: '1 hour' },
+                        { name: 'Optional Subject 2', description: 'Additional subject option', weightage: '25%', duration: '1 hour' }
+                    ]
+                };
+                showMessage('step2', 'Using generic subject data. You can customize this later.', 'warning');
+            }
+            
+            displaySubjects();
+        }
+
+        // Display subjects
+        function displaySubjects() {
+            const container = document.getElementById('subjectsContainer');
+            
+            if (!examData.subjects) {
+                container.innerHTML = '<p>No subjects available</p>';
+                return;
+            }
+
+            let html = '';
+
+            if (fallbackMode) {
+                html += '<div class="fallback-notice">⚠️ Using fallback data. Some features may be limited.</div>';
+            }
+
+            // Display mandatory subjects
+            if (examData.subjects.mandatorySubjects && examData.subjects.mandatorySubjects.length > 0) {
+                html += '<h3 style="margin-bottom: 15px; color: #dc3545;">Mandatory Subjects</h3>';
+                examData.subjects.mandatorySubjects.forEach(subject => {
+                    html += `
+                        <div class="subject-card mandatory selected">
+                            <div class="subject-type">Mandatory</div>
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="subject-description">${subject.description}</div>
+                            <div class="subject-details">
+                                <small>Weightage: ${subject.weightage} | Duration: ${subject.duration}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Display optional subjects
+            if (examData.subjects.optionalSubjects && examData.subjects.optionalSubjects.length > 0) {
+                html += '<h3 style="margin-bottom: 15px; color: #28a745;">Optional Subjects</h3>';
+                examData.subjects.optionalSubjects.forEach(subject => {
+                    html += `
+                        <div class="subject-card optional" onclick="toggleSubject(this, '${subject.name}')">
+                            <div class="subject-type">Optional</div>
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="subject-description">${subject.description}</div>
+                            <div class="subject-details">
+                                <small>Weightage: ${subject.weightage} | Duration: ${subject.duration}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Toggle subject selection
+        function toggleSubject(element, subjectName) {
+            element.classList.toggle('selected');
+            
+            if (!examData.selectedOptionalSubjects) {
+                examData.selectedOptionalSubjects = [];
+            }
+            
+            if (element.classList.contains('selected')) {
+                if (!examData.selectedOptionalSubjects.includes(subjectName)) {
+                    examData.selectedOptionalSubjects.push(subjectName);
+                }
+            } else {
+                const index = examData.selectedOptionalSubjects.indexOf(subjectName);
+                if (index > -1) {
+                    examData.selectedOptionalSubjects.splice(index, 1);
+                }
+            }
+        }
+
+        // Complete onboarding
+        async function completeOnboarding() {
+            setLoading('step3', true);
+
+            try {
+                // Store exam data in localStorage
+                localStorage.setItem('examData', JSON.stringify(examData));
+                localStorage.setItem('onboardingCompleted', 'true');
+                
+                // Try to save to server (optional)
+                try {
+                    const response = await fetch('/auth/onboarding/complete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            examName: examData.examName,
+                            gradeLevel: examData.gradeLevel,
+                            stream: examData.stream,
+                            selectedOptionalSubjects: examData.selectedOptionalSubjects || []
+                        })
+                    });
+
+                    if (response.ok) {
+                        showMessage('step3', 'Onboarding completed successfully! Redirecting to dashboard...', 'success');
+                    } else {
+                        showMessage('step3', 'Onboarding saved locally. Some features may be limited.', 'warning');
+                    }
+                } catch (error) {
+                    showMessage('step3', 'Onboarding saved locally. Some features may be limited.', 'warning');
+                }
+                
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 2000);
+            } catch (error) {
+                showMessage('step3', 'Error completing onboarding. Please try again.');
+            } finally {
+                setLoading('step3', false);
+            }
+        }
+
+        // Previous step
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        // Initialize
+        checkAuth();
+        
+        // Add enter key support
+        document.getElementById('examName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                validateExam();
+            }
+        });
+
+        // Show exam suggestions on focus
+        document.getElementById('examName').addEventListener('focus', () => {
+            document.getElementById('examSuggestions').style.display = 'block';
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#examName') && !e.target.closest('#examSuggestions')) {
+                document.getElementById('examSuggestions').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

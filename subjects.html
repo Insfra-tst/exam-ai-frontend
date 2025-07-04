@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Subjects - Exam Pattern Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo i {
+            color: #3498db;
+        }
+
+        .sidebar-subtitle {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: #e74c3c;
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+        }
+
+        .menu-section-title {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+            color: white;
+        }
+
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-item-text {
+            font-weight: 500;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .subjects-container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .exam-info {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .exam-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .exam-details {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+
+        .subjects-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        .section-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .subject-card.mandatory::before {
+            background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .subject-card.optional::before {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .subject-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .subject-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .subject-card.mandatory .subject-icon {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .subject-card.optional .subject-icon {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .subject-info {
+            flex: 1;
+        }
+
+        .subject-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .subject-type {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .subject-card.mandatory .subject-type {
+            color: #dc3545;
+        }
+
+        .subject-card.optional .subject-type {
+            color: #28a745;
+        }
+
+        .subject-description {
+            color: #6c757d;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .subject-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .subject-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .add-subject-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .add-subject-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-subject-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .add-subject-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .add-subject-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .add-subject-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+                Exam Pattern Analyzer
+            </div>
+            <div class="sidebar-subtitle">AI-Powered Exam Analysis</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Navigation</div>
+                <a href="/dashboard.html" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="menu-item-text">Dashboard</span>
+                </a>
+                <a href="/subjects.html" class="menu-item active">
+                    <i class="fas fa-book"></i>
+                    <span class="menu-item-text">All Subjects</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Analysis Tools</div>
+                <a href="/heatmap.html" class="menu-item">
+                    <i class="fas fa-th"></i>
+                    <span class="menu-item-text">Heatmap</span>
+                </a>
+                <a href="/topic-analysis.html" class="menu-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span class="menu-item-text">Topic Analysis</span>
+                </a>
+                <a href="/question-predictor.html" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Question Predictor</span>
+                </a>
+                <a href="/visual-analyzer.html" class="menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="menu-item-text">Visual Analyzer</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Account</div>
+                <a href="/profile.html" class="menu-item">
+                    <i class="fas fa-user"></i>
+                    <span class="menu-item-text">Profile</span>
+                </a>
+                <a href="#" onclick="logout()" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="menu-item-text">Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="subjects-container">
+            <div class="page-header">
+                <h1 class="page-title">All Subjects</h1>
+                <p class="page-subtitle">Manage your exam subjects and track your progress</p>
+            </div>
+
+            <div id="examInfo" class="exam-info">
+                <div class="loading">Loading exam information...</div>
+            </div>
+
+            <div id="messageContainer"></div>
+
+            <!-- Mandatory Subjects Section -->
+            <div class="subjects-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Mandatory Subjects
+                        <span class="section-count" id="mandatoryCount">0</span>
+                    </h2>
+                </div>
+                <div class="subjects-grid" id="mandatorySubjects">
+                    <div class="loading">Loading mandatory subjects...</div>
+                </div>
+            </div>
+
+            <!-- Optional Subjects Section -->
+            <div class="subjects-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Optional Subjects
+                        <span class="section-count" id="optionalCount">0</span>
+                    </h2>
+                </div>
+                <div class="subjects-grid" id="optionalSubjects">
+                    <div class="loading">Loading optional subjects...</div>
+                </div>
+            </div>
+
+            <!-- All Available Subjects Section -->
+            <div class="subjects-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-globe"></i>
+                        All Available Subjects
+                        <span class="section-count" id="allSubjectsCount">0</span>
+                    </h2>
+                </div>
+                <div class="subjects-grid" id="allSubjectsContainer">
+                    <div class="loading">Loading all available subjects...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = {};
+        let allSubjects = {};
+        let userSubjects = {
+            mandatory: [],
+            optional: []
+        };
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const userDataStr = localStorage.getItem('userData');
+            const examDataStr = localStorage.getItem('examData');
+            
+            console.log('Checking auth:', {
+                hasToken: !!token,
+                hasUserData: !!userDataStr,
+                hasExamData: !!examDataStr
+            });
+            
+            if (!token) {
+                console.log('No auth token, redirecting to auth');
+                window.location.href = '/auth.html';
+                return;
+            }
+
+            // Try to load user data
+            if (userDataStr) {
+                try {
+                    userData = JSON.parse(userDataStr);
+                    console.log('Loaded user data from localStorage:', userData);
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                }
+            }
+            
+            // If no user data but we have exam data, create user data
+            if (!userData && examDataStr) {
+                try {
+                    const examData = JSON.parse(examDataStr);
+                    userData = { examData: examData };
+                    console.log('Created user data from exam data:', userData);
+                } catch (error) {
+                    console.error('Error parsing exam data:', error);
+                }
+            }
+            
+            // If still no user data, redirect to onboarding
+            if (!userData || !userData.examData) {
+                console.log('No user data or exam data found, redirecting to onboarding');
+                window.location.href = '/onboarding.html';
+                return;
+            }
+            
+            console.log('Auth check passed, user data loaded');
+        }
+
+        // Load exam information
+        function loadExamInfo() {
+            const examData = userData.examData;
+            if (examData) {
+                const examInfo = document.getElementById('examInfo');
+                examInfo.innerHTML = `
+                    <div class="exam-name">${examData.examName}</div>
+                    <div class="exam-details">
+                        ${examData.gradeLevel ? `Grade ${examData.gradeLevel}` : ''}
+                        ${examData.stream ? ` • ${examData.stream} Stream` : ''}
+                    </div>
+                `;
+            }
+        }
+
+        // Load all available subjects
+        async function loadAllSubjects() {
+            try {
+                console.log('Loading all subjects...');
+                console.log('User data:', userData);
+                
+                // Check if userData is properly initialized
+                if (!userData || !userData.examData) {
+                    console.log('No user data found, trying to load from localStorage');
+                    const storedUserData = localStorage.getItem('userData');
+                    const storedExamData = localStorage.getItem('examData');
+                    
+                    if (storedUserData) {
+                        try {
+                            userData = JSON.parse(storedUserData);
+                            console.log('Loaded user data from localStorage:', userData);
+                        } catch (error) {
+                            console.error('Error parsing stored user data:', error);
+                        }
+                    }
+                    
+                    if (storedExamData && !userData?.examData) {
+                        try {
+                            const examData = JSON.parse(storedExamData);
+                            userData = { examData: examData };
+                            console.log('Loaded exam data from localStorage:', userData);
+                        } catch (error) {
+                            console.error('Error parsing stored exam data:', error);
+                        }
+                    }
+                }
+                
+                const examData = userData?.examData;
+                if (!examData || !examData.examName) {
+                    throw new Error('Exam data not found');
+                }
+
+                console.log('Attempting to fetch subjects from server...');
+                const response = await fetch('/auth/all-available-subjects', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (response.ok) {
+                    allSubjects = await response.json();
+                    console.log('Successfully loaded subjects from server:', allSubjects);
+                    loadUserSubjects();
+                    renderAllSubjects();
+                } else {
+                    throw new Error('Failed to load subjects from server');
+                }
+            } catch (error) {
+                console.error('Error loading all subjects:', error);
+                
+                // Use fallback data from user's exam data
+                if (userData?.examData?.subjects) {
+                    console.log('Using fallback data from user exam data');
+                    
+                    // Handle both array and object formats
+                    let subjectsArray = [];
+                    if (Array.isArray(userData.examData.subjects)) {
+                        subjectsArray = userData.examData.subjects;
+                    } else if (userData.examData.subjects.mandatorySubjects) {
+                        subjectsArray = userData.examData.subjects.mandatorySubjects.map(s => s.name);
+                        if (userData.examData.subjects.optionalSubjects) {
+                            subjectsArray = subjectsArray.concat(userData.examData.subjects.optionalSubjects.map(s => s.name));
+                        }
+                    }
+                    
+                    console.log('Processed subjects array:', subjectsArray);
+                    
+                    allSubjects = {
+                        subjects: subjectsArray.map(subjectName => ({
+                            name: subjectName,
+                            description: `${subjectName} for ${userData.examData.examName}`,
+                            type: 'subject'
+                        }))
+                    };
+                    loadUserSubjects();
+                    renderAllSubjects();
+                } else {
+                    console.log('No fallback data available, showing error message');
+                    // Show a more helpful error message
+                    const container = document.getElementById('allSubjectsContainer');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Unable to load subjects</h3>
+                                <p>Please complete your exam setup first or try refreshing the page.</p>
+                                <a href="/onboarding.html" class="btn btn-primary">
+                                    <i class="fas fa-rocket"></i>
+                                    Complete Setup
+                                </a>
+                            </div>
+                        `;
+                    }
+                    
+                    // Also show error in mandatory and optional sections
+                    const mandatoryContainer = document.getElementById('mandatorySubjects');
+                    const optionalContainer = document.getElementById('optionalSubjects');
+                    
+                    if (mandatoryContainer) {
+                        mandatoryContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-book-open"></i>
+                                <h3>No subjects found</h3>
+                                <p>Please complete your exam setup to see your subjects.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    if (optionalContainer) {
+                        optionalContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-plus-circle"></i>
+                                <h3>No optional subjects</h3>
+                                <p>Optional subjects will appear here after setup.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    document.getElementById('allSubjectsCount').textContent = '0';
+                    document.getElementById('mandatoryCount').textContent = '0';
+                    document.getElementById('optionalCount').textContent = '0';
+                }
+            }
+        }
+
+        // Render all available subjects
+        function renderAllSubjects() {
+            const container = document.getElementById('allSubjectsContainer');
+            if (!container) return;
+
+            if (!allSubjects.subjects || allSubjects.subjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h3>No subjects available</h3>
+                        <p>Subjects will appear here once they are available for your exam.</p>
+                    </div>
+                `;
+                document.getElementById('allSubjectsCount').textContent = '0';
+                return;
+            }
+
+            const subjectsHTML = allSubjects.subjects.map(subject => createAllSubjectCard(subject)).join('');
+            container.innerHTML = subjectsHTML;
+            document.getElementById('allSubjectsCount').textContent = allSubjects.subjects.length;
+        }
+
+        // Create card for all available subjects
+        function createAllSubjectCard(subject) {
+            const icons = {
+                'Mathematics': 'fas fa-calculator',
+                'Physics': 'fas fa-atom',
+                'Chemistry': 'fas fa-flask',
+                'Biology': 'fas fa-dna',
+                'English': 'fas fa-book-open',
+                'History': 'fas fa-landmark',
+                'Geography': 'fas fa-globe',
+                'Computer Science': 'fas fa-laptop-code',
+                'Economics': 'fas fa-chart-line',
+                'Literature': 'fas fa-quote-left',
+                'Accounting': 'fas fa-calculator',
+                'Business Studies': 'fas fa-briefcase',
+                'Political Science': 'fas fa-balance-scale',
+                'Sociology': 'fas fa-users',
+                'Psychology': 'fas fa-brain',
+                'Philosophy': 'fas fa-lightbulb',
+                'Art': 'fas fa-palette',
+                'Music': 'fas fa-music',
+                'Physical Education': 'fas fa-running',
+                'Information Technology': 'fas fa-desktop',
+                'Agriculture': 'fas fa-seedling',
+                'Engineering Technology': 'fas fa-cogs',
+                'Sinhala': 'fas fa-language',
+                'Tamil': 'fas fa-language',
+                'French': 'fas fa-language',
+                'German': 'fas fa-language',
+                'Spanish': 'fas fa-language',
+                'Chinese': 'fas fa-language',
+                'Japanese': 'fas fa-language',
+                'Arabic': 'fas fa-language'
+            };
+
+            const icon = icons[subject.name] || 'fas fa-book';
+            const isAlreadyAdded = userSubjects.subjects && userSubjects.subjects.includes(subject.name);
+            
+            return `
+                <div class="subject-card ${isAlreadyAdded ? 'added' : ''}" data-subject="${subject.name}">
+                    <div class="subject-header">
+                        <div class="subject-icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="subject-info">
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="subject-status">${isAlreadyAdded ? 'Added to Dashboard' : 'Available'}</div>
+                        </div>
+                    </div>
+                    <div class="subject-description">${subject.description || 'Subject description not available.'}</div>
+                    <div class="subject-actions">
+                        ${isAlreadyAdded ? `
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-check"></i>
+                                Already Added
+                            </button>
+                        ` : `
+                            <button class="btn btn-primary" onclick="addSubjectToDashboard('${subject.name}')">
+                                <i class="fas fa-plus"></i>
+                                Add to Dashboard
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load user's current subjects
+        function loadUserSubjects() {
+            const examData = userData.examData;
+            if (examData && examData.subjects) {
+                // Handle different subject formats
+                if (Array.isArray(examData.subjects)) {
+                    // New simplified format - all subjects together
+                    userSubjects.subjects = examData.subjects;
+                    userSubjects.mandatory = examData.subjects.map(subjectName => ({
+                        id: subjectName.toLowerCase().replace(/\s+/g, '-'),
+                        name: subjectName,
+                        type: 'subject',
+                        description: `${subjectName} for ${examData.examName}`,
+                        weightage: '25%',
+                        duration: '2 hours'
+                    }));
+                    userSubjects.optional = [];
+                } else if (examData.subjects.mandatorySubjects) {
+                    // New format from comprehensive subjects
+                    userSubjects.mandatory = examData.subjects.mandatorySubjects.map(subject => ({
+                        id: subject.code || subject.name.toLowerCase().replace(/\s+/g, '-'),
+                        name: subject.name,
+                        type: 'mandatory',
+                        description: subject.description,
+                        weightage: subject.weightage,
+                        duration: subject.duration,
+                        marks: subject.marks
+                    }));
+
+                    // Extract optional subjects
+                    if (examData.subjects.optionalSubjects) {
+                        const allOptional = examData.subjects.optionalSubjects.map(subject => ({
+                            id: subject.code || subject.name.toLowerCase().replace(/\s+/g, '-'),
+                            name: subject.name,
+                            type: 'optional',
+                            description: subject.description,
+                            weightage: subject.weightage,
+                            duration: subject.duration,
+                            marks: subject.marks
+                        }));
+                        
+                        // Filter to show only selected optional subjects
+                        if (examData.selectedOptionalSubjects) {
+                            userSubjects.optional = allOptional.filter(subject => 
+                                examData.selectedOptionalSubjects.includes(subject.name)
+                            );
+                        } else {
+                            userSubjects.optional = [];
+                        }
+                        
+                        // Store all optional subjects for the add dropdown
+                        allSubjects.subjects = {
+                            mandatory: userSubjects.mandatory,
+                            optional: allOptional
+                        };
+                    }
+                } else if (examData.subjects.mandatory) {
+                    // Old format
+                    userSubjects.mandatory = examData.subjects.mandatory.map(subject => ({
+                        id: subject.code || subject.name.toLowerCase().replace(/\s+/g, '-'),
+                        name: subject.name,
+                        type: 'mandatory',
+                        description: subject.description,
+                        weightage: subject.weightage,
+                        duration: subject.duration,
+                        marks: subject.marks
+                    }));
+                }
+            }
+
+            renderSubjects();
+        }
+
+        // Render subjects
+        function renderSubjects() {
+            renderSubjectSection('mandatorySubjects', userSubjects.mandatory, 'mandatory');
+            renderSubjectSection('optionalSubjects', userSubjects.optional, 'optional');
+            
+            // Update counts
+            document.getElementById('mandatoryCount').textContent = userSubjects.mandatory.length;
+            document.getElementById('optionalCount').textContent = userSubjects.optional.length;
+        }
+
+        // Render subject section
+        function renderSubjectSection(containerId, subjects, type) {
+            const container = document.getElementById(containerId);
+            
+            if (subjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h3>No ${type} subjects</h3>
+                        <p>${type === 'mandatory' ? 'Mandatory subjects will appear here after onboarding.' : 'Add optional subjects to expand your study plan.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const subjectsHTML = subjects.map(subject => createSubjectCard(subject)).join('');
+            container.innerHTML = subjectsHTML;
+        }
+
+        // Create subject card
+        function createSubjectCard(subject) {
+            const icons = {
+                'Mathematics': 'fas fa-calculator',
+                'Physics': 'fas fa-atom',
+                'Chemistry': 'fas fa-flask',
+                'Biology': 'fas fa-dna',
+                'English': 'fas fa-book-open',
+                'History': 'fas fa-landmark',
+                'Geography': 'fas fa-globe',
+                'Computer Science': 'fas fa-laptop-code',
+                'Economics': 'fas fa-chart-line',
+                'Literature': 'fas fa-quote-left',
+                'Accounting': 'fas fa-calculator',
+                'Business Studies': 'fas fa-briefcase',
+                'Political Science': 'fas fa-balance-scale',
+                'Sociology': 'fas fa-users',
+                'Psychology': 'fas fa-brain',
+                'Philosophy': 'fas fa-lightbulb',
+                'Art': 'fas fa-palette',
+                'Music': 'fas fa-music',
+                'Physical Education': 'fas fa-running',
+                'Information Technology': 'fas fa-desktop',
+                'Agriculture': 'fas fa-seedling',
+                'Engineering Technology': 'fas fa-cogs',
+                'Sinhala': 'fas fa-language',
+                'Tamil': 'fas fa-language',
+                'French': 'fas fa-language',
+                'German': 'fas fa-language',
+                'Spanish': 'fas fa-language',
+                'Chinese': 'fas fa-language',
+                'Japanese': 'fas fa-language',
+                'Arabic': 'fas fa-language'
+            };
+
+            const icon = icons[subject.name] || 'fas fa-book';
+            const subjectId = subject.id || subject.name.toLowerCase().replace(/\s+/g, '-');
+            
+            return `
+                <div class="subject-card ${subject.type}" onclick="selectSubject('${subjectId}', '${subject.name}')" data-subject-id="${subjectId}">
+                    <div class="subject-header">
+                        <div class="subject-icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="subject-info">
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="subject-type">${subject.type}</div>
+                        </div>
+                    </div>
+                    <div class="subject-description">${subject.description || 'Subject description not available.'}</div>
+                    <div class="subject-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Weightage</div>
+                            <div class="detail-value">${subject.weightage || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Duration</div>
+                            <div class="detail-value">${subject.duration || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="subject-actions">
+                        <a href="/dashboard.html?subject=${encodeURIComponent(subject.name)}" class="btn btn-primary">
+                            <i class="fas fa-chart-line"></i>
+                            Analyze
+                        </a>
+                        ${subject.type === 'optional' ? `
+                        <button class="btn btn-danger" onclick="removeSubject('${subjectId}', '${subject.name}')">
+                            <i class="fas fa-trash"></i>
+                            Remove
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Populate subject select dropdown
+        function populateSubjectSelect() {
+            const select = document.getElementById('subjectSelect');
+            select.innerHTML = '<option value="">Choose a subject to add...</option>';
+            
+            if (allSubjects.subjects && allSubjects.subjects.optional) {
+                const availableOptional = allSubjects.subjects.optional.filter(subject => 
+                    !userSubjects.optional.some(userSubject => userSubject.name === subject.name)
+                );
+                
+                availableOptional.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.name;
+                    option.textContent = subject.name;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        // Add subject
+        async function addSubject() {
+            const subjectName = document.getElementById('subjectSelect').value;
+            
+            if (!subjectName) {
+                showMessage('Please select a subject to add.', 'error');
+                return;
+            }
+
+            try {
+                // Find the subject in all available subjects
+                const subject = allSubjects.subjects.optional.find(s => s.name === subjectName);
+                if (!subject) {
+                    throw new Error('Subject not found');
+                }
+
+                // Add to user's optional subjects
+                const newSubject = {
+                    ...subject,
+                    type: 'optional'
+                };
+                
+                userSubjects.optional.push(newSubject);
+                
+                // Update user's exam data with selected optional subjects
+                const selectedOptionalSubjects = userSubjects.optional.map(s => s.name);
+                
+                // Update backend
+                const response = await fetch('/auth/update-user-subjects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify({
+                        selectedOptionalSubjects: selectedOptionalSubjects
+                    })
+                });
+
+                if (response.ok) {
+                    // Update local user data
+                    if (userData.examData) {
+                        userData.examData.selectedOptionalSubjects = selectedOptionalSubjects;
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    // Re-render
+                    renderSubjects();
+                    populateSubjectSelect();
+                    
+                    showMessage(`Successfully added ${subjectName} to your subjects.`, 'success');
+                } else {
+                    throw new Error('Failed to update subjects');
+                }
+                
+            } catch (error) {
+                console.error('Error adding subject:', error);
+                showMessage('Failed to add subject. Please try again.', 'error');
+            }
+        }
+
+        // Add subject to dashboard
+        async function addSubjectToDashboard(subjectName) {
+            try {
+                // Add to user's subjects
+                if (!userSubjects.subjects) {
+                    userSubjects.subjects = [];
+                }
+                
+                if (!userSubjects.subjects.includes(subjectName)) {
+                    userSubjects.subjects.push(subjectName);
+                    
+                    // Update user's exam data
+                    if (userData.examData) {
+                        userData.examData.subjects = userSubjects.subjects;
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    // Re-render
+                    loadUserSubjects();
+                    renderAllSubjects();
+                    
+                    showMessage(`Successfully added ${subjectName} to your dashboard.`, 'success');
+                } else {
+                    showMessage(`${subjectName} is already added to your dashboard.`, 'info');
+                }
+                
+            } catch (error) {
+                console.error('Error adding subject to dashboard:', error);
+                showMessage('Failed to add subject to dashboard. Please try again.', 'error');
+            }
+        }
+
+        // Remove subject
+        async function removeSubject(subjectId, subjectName) {
+            if (confirm(`Are you sure you want to remove ${subjectName} from your subjects?`)) {
+                try {
+                    userSubjects.optional = userSubjects.optional.filter(subject => subject.id !== subjectId);
+                    
+                    // Update user's exam data with selected optional subjects
+                    const selectedOptionalSubjects = userSubjects.optional.map(s => s.name);
+                    
+                    // Update backend
+                    const response = await fetch('/auth/update-user-subjects', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            selectedOptionalSubjects: selectedOptionalSubjects
+                        })
+                    });
+
+                    if (response.ok) {
+                        // Update local user data
+                        if (userData.examData) {
+                            userData.examData.selectedOptionalSubjects = selectedOptionalSubjects;
+                        }
+                        
+                        // Save to localStorage
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        
+                        // Re-render
+                        renderSubjects();
+                        populateSubjectSelect();
+                        
+                        showMessage(`Successfully removed ${subjectName} from your subjects.`, 'success');
+                    } else {
+                        throw new Error('Failed to update subjects');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error removing subject:', error);
+                    showMessage('Failed to remove subject. Please try again.', 'error');
+                }
+            }
+        }
+
+        // Select subject for analysis
+        function selectSubject(subjectId, subjectName) {
+            // Store selected subject
+            const selectedSubject = {
+                id: subjectId,
+                name: subjectName,
+                examName: userData.examData.examName,
+                gradeLevel: userData.examData.gradeLevel,
+                stream: userData.examData.stream
+            };
+            
+            localStorage.setItem('selectedSubject', JSON.stringify(selectedSubject));
+            
+            // Redirect to dashboard with subject context
+            window.location.href = `/dashboard.html?subject=${encodeURIComponent(subjectName)}`;
+        }
+
+        // Show message
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            messageDiv.textContent = message;
+            
+            container.appendChild(messageDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 5000);
+        }
+
+        // Logout
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/auth.html';
+        }
+
+        // Initialize
+        checkAuth();
+        loadExamInfo();
+        loadAllSubjects();
+    </script>
+</body>
+</html> 

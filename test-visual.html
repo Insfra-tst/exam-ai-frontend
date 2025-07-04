@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Analyzer Test</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .status { margin: 10px 0; padding: 10px; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>Visual Analyzer Test Page</h1>
+    
+    <div class="test-section">
+        <h3>Test Controls</h3>
+        <button onclick="testAPI()">Test API</button>
+        <button onclick="testDataGeneration()">Test Data Generation</button>
+        <button onclick="testChartRendering()">Test Chart Rendering</button>
+        <button onclick="testFunctions()">Test Functions</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>Status</h3>
+        <div id="status" class="status">Ready for testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Chart Test Area</h3>
+        <div id="testChart" style="width: 600px; height: 400px;"></div>
+    </div>
+    
+    <script>
+        let testData = null;
+        
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message;
+            console.log(message);
+        }
+        
+        async function testAPI() {
+            updateStatus('Testing API...');
+            try {
+                const response = await fetch('/api/generate-visual-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ examType: 'SAT', subject: 'Math' })
+                });
+                
+                const data = await response.json();
+                updateStatus(`API Test: ${data.success ? 'SUCCESS' : 'FAILED'} - ${JSON.stringify(data).substring(0, 100)}...`);
+                testData = data.visualData;
+            } catch (error) {
+                updateStatus(`API Test: ERROR - ${error.message}`);
+            }
+        }
+        
+        async function testDataGeneration() {
+            updateStatus('Testing data generation...');
+            if (!testData) {
+                updateStatus('No test data available. Run API test first.');
+                return;
+            }
+            
+            updateStatus(`Data Test: SUCCESS - ${testData.mainHotspots.length} topics loaded`);
+        }
+        
+        function testChartRendering() {
+            updateStatus('Testing chart rendering...');
+            if (!testData) {
+                updateStatus('No test data available. Run API test first.');
+                return;
+            }
+            
+            try {
+                const chartData = [{
+                    values: testData.mainHotspots.map(item => item.percentage),
+                    labels: testData.mainHotspots.map(item => item.topic),
+                    type: 'pie',
+                    hole: 0.4
+                }];
+                
+                const layout = {
+                    title: 'Test Pie Chart',
+                    height: 400
+                };
+                
+                Plotly.newPlot('testChart', chartData, layout);
+                updateStatus('Chart Test: SUCCESS - Pie chart rendered');
+            } catch (error) {
+                updateStatus(`Chart Test: ERROR - ${error.message}`);
+            }
+        }
+        
+        function testFunctions() {
+            updateStatus('Testing functions...');
+            
+            // Test if functions exist
+            const functions = ['highlightTopTopics', 'showEasyWins', 'analyzeWeakAreas'];
+            const results = functions.map(func => {
+                return typeof window[func] === 'function' ? 'EXISTS' : 'MISSING';
+            });
+            
+            updateStatus(`Functions Test: ${results.join(', ')}`);
+        }
+        
+        // Load the visual analyzer script
+        const script = document.createElement('script');
+        script.src = 'visual-analyzer.js';
+        script.onload = function() {
+            updateStatus('Visual Analyzer script loaded successfully');
+        };
+        script.onerror = function() {
+            updateStatus('ERROR: Failed to load visual-analyzer.js');
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html> 

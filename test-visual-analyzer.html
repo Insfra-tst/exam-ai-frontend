@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Analyzer Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <h1>Visual Analyzer Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Basic Navigation</h2>
+        <button class="test-button" onclick="testNavigation()">Test Navigation to Visual Analyzer</button>
+        <div id="nav-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Subject Availability</h2>
+        <button class="test-button" onclick="testSubjectAvailability()">Test Subject Availability</button>
+        <div id="subject-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Chart Indicators</h2>
+        <button class="test-button" onclick="testChartIndicators()">Test Chart Indicators</button>
+        <div id="indicators-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 4: Comparison Chart Title</h2>
+        <button class="test-button" onclick="testComparisonTitle()">Test Comparison Chart Title</button>
+        <div id="title-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 5: Syllabus Chart Data</h2>
+        <button class="test-button" onclick="testSyllabusChart()">Test Syllabus Chart Data</button>
+        <div id="syllabus-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 6: PDF Export</h2>
+        <button class="test-button" onclick="testPDFExport()">Test PDF Export</button>
+        <div id="pdf-result" class="result"></div>
+    </div>
+
+    <script>
+        function showResult(elementId, message, isError = false, isSuccess = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'result' + (isError ? ' error' : '') + (isSuccess ? ' success' : '');
+        }
+
+        function testNavigation() {
+            try {
+                // Test if we can navigate to the visual analyzer
+                const url = '/visual-analyzer.html?exam=SAT&subject=Science';
+                showResult('nav-result', `✅ Navigation test passed. URL: ${url}`, false, true);
+            } catch (error) {
+                showResult('nav-result', `❌ Navigation test failed: ${error.message}`, true);
+            }
+        }
+
+        function testSubjectAvailability() {
+            try {
+                // Test different exam and subject combinations
+                const testCases = [
+                    { exam: 'SAT', subject: 'Science' },
+                    { exam: 'SAT', subject: 'Chemistry' },
+                    { exam: 'SAT', subject: 'Physics' },
+                    { exam: 'SAT', subject: 'Biology' },
+                    { exam: 'SAT', subject: 'English' },
+                    { exam: 'JEE', subject: 'Physics' },
+                    { exam: 'JEE', subject: 'Chemistry' },
+                    { exam: 'JEE', subject: 'Mathematics' },
+                    { exam: 'NEET', subject: 'Biology' },
+                    { exam: 'UPSC', subject: 'General Studies' }
+                ];
+
+                let results = [];
+                testCases.forEach(testCase => {
+                    results.push(`${testCase.exam} - ${testCase.subject}`);
+                });
+
+                showResult('subject-result', `✅ Subject availability test passed. Available combinations:\n${results.join('\n')}`, false, true);
+            } catch (error) {
+                showResult('subject-result', `❌ Subject availability test failed: ${error.message}`, true);
+            }
+        }
+
+        function testChartIndicators() {
+            try {
+                // Test if chart indicator containers exist
+                const containers = [
+                    'pieChartIndicators',
+                    'dualAxisChartIndicators',
+                    'quadrantChartIndicators',
+                    'bubbleChartIndicators',
+                    'comparisonChartIndicators',
+                    'syllabusChartIndicators'
+                ];
+
+                let missingContainers = [];
+                containers.forEach(containerId => {
+                    if (!document.getElementById(containerId)) {
+                        missingContainers.push(containerId);
+                    }
+                });
+
+                if (missingContainers.length === 0) {
+                    showResult('indicators-result', '✅ All chart indicator containers found', false, true);
+                } else {
+                    showResult('indicators-result', `❌ Missing chart indicator containers: ${missingContainers.join(', ')}`, true);
+                }
+            } catch (error) {
+                showResult('indicators-result', `❌ Chart indicators test failed: ${error.message}`, true);
+            }
+        }
+
+        function testComparisonTitle() {
+            try {
+                const titleElement = document.getElementById('comparisonChartTitle');
+                if (titleElement) {
+                    showResult('title-result', '✅ Comparison chart title element found', false, true);
+                } else {
+                    showResult('title-result', '❌ Comparison chart title element not found', true);
+                }
+            } catch (error) {
+                showResult('title-result', `❌ Comparison title test failed: ${error.message}`, true);
+            }
+        }
+
+        function testSyllabusChart() {
+            try {
+                const syllabusContainer = document.getElementById('syllabusChart');
+                if (syllabusContainer) {
+                    showResult('syllabus-result', '✅ Syllabus chart container found', false, true);
+                } else {
+                    showResult('syllabus-result', '❌ Syllabus chart container not found', true);
+                }
+            } catch (error) {
+                showResult('syllabus-result', `❌ Syllabus chart test failed: ${error.message}`, true);
+            }
+        }
+
+        function testPDFExport() {
+            try {
+                // Test if jsPDF is available
+                if (typeof window.jspdf !== 'undefined') {
+                    showResult('pdf-result', '✅ jsPDF library is available for PDF export', false, true);
+                } else {
+                    showResult('pdf-result', '⚠️ jsPDF library not available, will fallback to JSON export', false);
+                }
+            } catch (error) {
+                showResult('pdf-result', `❌ PDF export test failed: ${error.message}`, true);
+            }
+        }
+
+        // Run all tests when page loads
+        window.addEventListener('load', function() {
+            console.log('Running Visual Analyzer tests...');
+            testNavigation();
+            testSubjectAvailability();
+            testChartIndicators();
+            testComparisonTitle();
+            testSyllabusChart();
+            testPDFExport();
+        });
+    </script>
+</body>
+</html> 

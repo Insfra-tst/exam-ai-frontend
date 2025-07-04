@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Short Notes - Quick Reference</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-logo i {
+            color: #3498db;
+        }
+        
+        .sidebar-subtitle {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-section-title {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item-text {
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 40px 30px 40px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .breadcrumb::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            z-index: -1;
+        }
+        
+        .breadcrumb-item {
+            color: #5a6c7d;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .breadcrumb-item:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .breadcrumb-item.active {
+            color: #2c3e50;
+            font-weight: 700;
+            background: rgba(44, 62, 80, 0.1);
+        }
+        
+        .breadcrumb-separator {
+            color: #bdc3c7;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .notes-container {
+            background: #fefefe;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .notes-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 20%, #f1c40f 40%, #27ae60 60%, #3498db 80%, #9b59b6 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .notes-header {
+            margin-bottom: 30px;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notes-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .notes-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .note-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #9b59b6;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .note-number {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #9b59b6;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .note-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .note-content {
+            color: #34495e;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        
+        .note-icon {
+            color: #9b59b6;
+            font-size: 1.2rem;
+        }
+        
+        .key-points {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .key-points-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .key-points-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .key-points-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .key-points-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .key-points-list li::before {
+            content: '📝';
+            font-size: 1.1rem;
+        }
+        
+        .formula-section {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .formula-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .formula-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .loading i {
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        
+        .loading h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .loading p {
+            color: #7f8c8d;
+        }
+        
+        .error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #e74c3c;
+            text-align: center;
+        }
+        
+        .error i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media print {
+            .sidebar, .breadcrumb, .print-btn {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .notes-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .notes-title {
+                font-size: 2rem;
+            }
+            
+            .notes-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-fire"></i>
+                Exam AI
+            </div>
+            <div class="sidebar-subtitle">AI-Powered Exam Analysis</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Analysis Tools</div>
+                <a href="/heatmap.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="menu-item-text">Syllabus Heatmap</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-microscope"></i>
+                    <span class="menu-item-text">Visual Analyzer</span>
+                </a>
+                <a href="/question-predictor.html" class="menu-item">
+                    <i class="fas fa-crystal-ball"></i>
+                    <span class="menu-item-text">Question Predictor</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-trophy"></i>
+                    <span class="menu-item-text">Easy Score</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Learning Tools</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="menu-item-text">Easy Learn</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="menu-item-text">Quick Notes</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">AI Assistance</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="menu-item-text">AI Feedback Engine</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Ask Doubt AI</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Breadcrumb -->
+        <div id="breadcrumb" class="breadcrumb">
+            <a href="/" class="breadcrumb-item">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <a href="/heatmap.html" class="breadcrumb-item">
+                <i class="fas fa-chart-line"></i>
+                Syllabus Heatmap
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <a href="/topic-analysis.html" class="breadcrumb-item">
+                <i class="fas fa-layer-group"></i>
+                Topic Analysis
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <a href="/question-types.html" class="breadcrumb-item">
+                <i class="fas fa-list"></i>
+                Question Types
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <span class="breadcrumb-item active">
+                <i class="fas fa-sticky-note"></i>
+                Short Notes
+            </span>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Generating Short Notes...</h3>
+            <p>Creating comprehensive quick reference notes</p>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Short Notes Section -->
+        <div id="notesSection" class="notes-container hidden">
+            <div class="notes-header">
+                <div>
+                    <h2 class="notes-title" id="notesTitle">Short Notes</h2>
+                    <p class="notes-subtitle" id="notesSubtitle">Quick reference guide for this question type</p>
+                </div>
+                <button class="print-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print Notes
+                </button>
+            </div>
+            
+            <div id="notesContent">
+                <!-- Notes content will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="short-notes.js"></script>
+</body>
+</html> 
