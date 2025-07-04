@@ -6,7 +6,6 @@
     <title>Authentication - Exam Pattern Analyzer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="js/config.js"></script>
     <style>
         * {
             margin: 0;
@@ -362,7 +361,7 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const response = await fetch(window.getApiUrl('/auth/login'), {
+                const response = await fetch('/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -415,7 +414,7 @@
             const password = document.getElementById('signupPassword').value;
 
             try {
-                const response = await fetch(window.getApiUrl('/auth/signup'), {
+                const response = await fetch('/auth/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -13,14 +13,14 @@ window.APP_CONFIG = {
         OPENAI_INTEGRATION: true,
         TOKEN_SYSTEM: true,
         PAYMENT_SYSTEM: true,
-        EMAIL_VERIFICATION: true
+        EMAIL_VERIFICATION: false // Disabled email verification
     },
     
     // API Endpoints
     ENDPOINTS: {
         AUTH: {
             LOGIN: '/auth/login',
-            REGISTER: '/auth/register',
+            REGISTER: '/auth/signup', // Updated to match backend
             LOGOUT: '/auth/logout',
             VERIFY: '/auth/verify',
             RESET_PASSWORD: '/auth/reset-password'
@@ -58,7 +58,7 @@ window.getApiUrl = function(endpoint) {
 // Helper function to make API calls
 window.apiCall = async function(endpoint, options = {}) {
     const url = getApiUrl(endpoint);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken'); // Updated to match auth.html
     
     const defaultOptions = {
         headers: {
@@ -95,8 +95,8 @@ window.apiCall = async function(endpoint, options = {}) {
 // Helper function to handle authentication
 window.handleAuthError = function(error) {
     if (error.message.includes('401') || error.message.includes('token')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem('authToken'); // Updated to match auth.html
+        localStorage.removeItem('userData'); // Updated to match auth.html
         window.location.href = '/auth.html';
     }
 };
