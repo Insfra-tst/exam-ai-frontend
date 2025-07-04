@@ -1,0 +1,13 @@
+{
+  "name": "exam-ai-frontend",
+  "version": "1.0.0",
+  "description": "Exam AI Frontend - Static Files",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static files - no build needed'",
+    "start": "echo 'Static files - no start needed'"
+  },
+  "keywords": ["exam", "ai", "frontend", "static"],
+  "author": "Exam AI Team",
+  "license": "MIT"
+} 
