@@ -319,8 +319,15 @@
         </form>
     </div>
 
-    <script src="js/config.js"></script>
     <script>
+        // API Configuration
+        const API_BASE_URL = 'https://exam-ai-backend.onrender.com';
+        
+        // Helper function to get full API URL
+        function getApiUrl(endpoint) {
+            return API_BASE_URL + endpoint;
+        }
+        
         let currentTab = 'login';
 
         function switchTab(tab) {
