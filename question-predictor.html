@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Predictor - AI-Powered Exam Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-logo i {
+            color: #3498db;
+        }
+        
+        .sidebar-subtitle {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-section-title {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item-text {
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+        
+        .question-predictor-container {
+            background: #fefefe;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .question-predictor-header {
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .question-predictor-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .question-predictor-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .question-predictor-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .question-predictor-tile {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: calc(33.33% - 14px);
+            min-width: 300px;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-predictor-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .question-predictor-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .question-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .question-topic {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .question-explanation {
+            color: #5a6c7d;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .heatmap-score-section {
+            margin-bottom: 20px;
+        }
+        
+        .heatmap-score-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .heatmap-score-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .heatmap-score-bar {
+            flex: 1;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .heatmap-score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 25%, #f1c40f 50%, #27ae60 75%, #3498db 100%);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        .heatmap-score-text {
+            font-weight: 700;
+            color: #667eea;
+            min-width: 50px;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+        
+        .example-questions-section {
+            margin-top: 20px;
+        }
+        
+        .example-questions-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .example-questions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .example-question-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        .example-question-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .generate-random-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .generate-random-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        .random-question-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+        }
+        
+        .random-question-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .random-question-text {
+            color: #5a6c7d;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .solve-answer-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .solve-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+        }
+        
+        .solution-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .solution-answer {
+            color: #000;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .solution-steps {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .solution-steps ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .solution-steps li {
+            margin-bottom: 5px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            min-width: 300px;
+        }
+        
+        .loading i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .loading h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .loading p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .random-question-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .load-more-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .load-more-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .question-predictor-title {
+                font-size: 2rem;
+            }
+            
+            .question-predictor-tile {
+                width: calc(50% - 20px);
+            }
+            
+            .question-name {
+                font-size: 1.2rem;
+            }
+            
+            .example-questions-grid {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .example-question-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .question-predictor-tile {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            .question-predictor-title {
+                font-size: 1.8rem;
+            }
+            
+            .question-name {
+                font-size: 1.1rem;
+            }
+            
+            .question-explanation {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-fire"></i>
+                Exam AI
+            </div>
+            <div class="sidebar-subtitle">AI-Powered Exam Analysis</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Analysis Tools</div>
+                <a href="/heatmap.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="menu-item-text">Syllabus Heatmap</span>
+                </a>
+                <a href="/visual-analyzer.html" class="menu-item">
+                    <i class="fas fa-microscope"></i>
+                    <span class="menu-item-text">Visual Analyzer</span>
+                </a>
+                <a href="/question-predictor.html" class="menu-item active">
+                    <i class="fas fa-crystal-ball"></i>
+                    <span class="menu-item-text">Question Predictor</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-trophy"></i>
+                    <span class="menu-item-text">Easy Score</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Learning Tools</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="menu-item-text">Easy Learn</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="menu-item-text">Quick Notes</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">AI Assistance</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="menu-item-text">AI Feedback Engine</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Ask Doubt AI</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Generating Question Predictions...</h3>
+            <p>Analyzing exam patterns and generating predicted questions (3 at a time)</p>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Question Predictor Section -->
+        <div id="questionPredictorSection" class="question-predictor-container hidden">
+            <div class="question-predictor-header">
+                <h2 class="question-predictor-title">
+                    <i class="fas fa-crystal-ball"></i>
+                    Question Predictor
+                </h2>
+                <p class="question-predictor-subtitle">AI-powered prediction of most likely question types for upcoming exams</p>
+            </div>
+            
+            <div class="question-predictor-grid" id="questionPredictorGrid">
+                <!-- Question prediction tiles will be generated here -->
+            </div>
+            
+            <!-- Load More Button -->
+            <div id="loadMoreSection" class="load-more-section hidden">
+                <button class="load-more-btn" onclick="loadMoreQuestions()">
+                    <i class="fas fa-plus"></i>
+                    Load 3 More Questions
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="question-predictor.js"></script>
+</body>
+</html> 

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Analysis - In-Depth Study</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .analysis-container {
+            background: #fefefe;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .analysis-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 20%, #f1c40f 40%, #27ae60 60%, #3498db 80%, #9b59b6 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .analysis-header {
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .analysis-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .analysis-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .analysis-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-btn i {
+            margin-right: 8px;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .question-section {
+            margin-bottom: 30px;
+        }
+        
+        .question-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .solve-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        .solve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .answer-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            margin-top: 20px;
+        }
+        
+        .answer-text {
+            font-weight: 600;
+            color: #155724;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .explanation-text {
+            color: #155724;
+            line-height: 1.6;
+        }
+        
+        .note-text, .tips-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .tips-list li::before {
+            content: '💡';
+            margin-right: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <i class="fas fa-search"></i>
+                    Topic Analysis
+                </h1>
+                <p class="subtitle">In-Depth Study & Practice</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div style="margin-bottom: 20px;">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Back to Topics
+            </button>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Generating Analysis...</h3>
+            <p>Creating comprehensive study materials and practice questions</p>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Analysis Section -->
+        <div id="analysisSection" class="analysis-container hidden">
+            <div class="analysis-header">
+                <h2 class="analysis-title" id="analysisTitle">Topic Analysis</h2>
+                <p class="analysis-subtitle" id="analysisSubtitle">Comprehensive study guide and practice materials</p>
+            </div>
+            
+            <div class="analysis-tabs">
+                <button class="tab-btn active" data-tab="question">
+                    <i class="fas fa-question-circle"></i>
+                    Practice Questions
+                </button>
+                <button class="tab-btn" data-tab="note">
+                    <i class="fas fa-sticky-note"></i>
+                    Key Concepts
+                </button>
+                <button class="tab-btn" data-tab="tips">
+                    <i class="fas fa-lightbulb"></i>
+                    Study Tips
+                </button>
+            </div>
+            
+            <div class="tab-content">
+                <div id="questionTab" class="tab-pane active">
+                    <div class="question-section">
+                        <h4><i class="fas fa-question"></i> Sample Question</h4>
+                        <div id="sampleQuestion" class="question-text"></div>
+                        
+                        <button id="solveBtn" class="solve-btn">
+                            <i class="fas fa-eye"></i>
+                            Show Answer
+                        </button>
+                        
+                        <div id="answerSection" class="answer-section hidden">
+                            <h4><i class="fas fa-check-circle"></i> Answer</h4>
+                            <div id="answer" class="answer-text"></div>
+                            
+                            <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                            <div id="explanation" class="explanation-text"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="noteTab" class="tab-pane">
+                    <h4><i class="fas fa-sticky-note"></i> Key Concepts</h4>
+                    <div id="shortNote" class="note-text"></div>
+                </div>
+                
+                <div id="tipsTab" class="tab-pane">
+                    <h4><i class="fas fa-lightbulb"></i> Study Tips & Strategies</h4>
+                    <div id="learningTips" class="tips-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="analysis.js"></script>
+</body>
+</html> 

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Pattern Analyzer - AI-Powered Exam Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-logo i {
+            color: #3498db;
+        }
+        
+        .sidebar-subtitle {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-section-title {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item-text {
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .logo i {
+            color: #3498db;
+            font-size: 4rem;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            color: #5a6c7d;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .analyze-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+        
+        .features {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .feature-description {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .logo i {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-fire"></i>
+                Exam AI
+            </div>
+            <div class="sidebar-subtitle">AI-Powered Exam Analysis</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Analysis Tools</div>
+                <a href="/heatmap.html" class="menu-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="menu-item-text">Syllabus Heatmap</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-microscope"></i>
+                    <span class="menu-item-text">Virtual Analyzer</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-crystal-ball"></i>
+                    <span class="menu-item-text">Question Predictor</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Learning Tools</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="menu-item-text">Easy Learn</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="menu-item-text">Quick Notes</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-trophy"></i>
+                    <span class="menu-item-text">Easy Score</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">AI Assistance</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="menu-item-text">AI Feedback Engine</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Ask Doubt AI</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Header -->
+            <header class="header">
+                <h1 class="logo">
+                    <i class="fas fa-fire"></i>
+                    Exam Pattern Analyzer
+                </h1>
+                <p class="subtitle">AI-Powered Exam Analysis & Learning Platform</p>
+                <p class="description">
+                    Analyze past papers, predict question patterns, and optimize your exam preparation with advanced AI technology.
+                </p>
+            </header>
+
+            <!-- Analysis Form -->
+            <div class="form-container">
+                <form id="analysisForm">
+                    <div class="form-group">
+                        <label for="examType" class="form-label">
+                            <i class="fas fa-graduation-cap"></i>
+                            Exam Type
+                        </label>
+                        <input type="text" id="examType" class="form-input" placeholder="e.g., JEE Main, NEET, CAT, UPSC" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject" class="form-label">
+                            <i class="fas fa-book"></i>
+                            Subject
+                        </label>
+                        <input type="text" id="subject" class="form-input" placeholder="e.g., Mathematics, Physics, Chemistry" required>
+                    </div>
+                    
+                    <button type="submit" class="analyze-btn" id="analyzeBtn">
+                        <i class="fas fa-search"></i>
+                        Analyze Exam Pattern
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Analyzing exam patterns...</p>
+                </div>
+                
+                <div class="error" id="error"></div>
+            </div>
+
+            <!-- Features -->
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Heatmap Analysis</h3>
+                    <p class="feature-description">
+                        Visualize topic frequency and importance based on historical exam data with interactive heatmaps.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">AI Predictions</h3>
+                    <p class="feature-description">
+                        Get AI-powered predictions for likely question types and topics in upcoming exams.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Learning</h3>
+                    <p class="feature-description">
+                        Personalized learning paths and study strategies based on your exam analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

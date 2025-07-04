@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Setup - Exam Pattern Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+            letter-spacing: -0.2px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 400;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .optional {
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: inherit;
+            letter-spacing: -0.2px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .subjects-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .subjects-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #333;
+            letter-spacing: -0.5px;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .subject-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .subject-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .subject-card.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .subject-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 16px;
+            letter-spacing: -0.2px;
+        }
+
+        .subject-type {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mandatory {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .mandatory.selected {
+            background: #ffe6e6;
+        }
+
+        .mandatory .subject-type {
+            color: #dc3545;
+        }
+
+        .optional .subject-type {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Quick Setup</h1>
+            <p>Enter your exam details to get started</p>
+        </div>
+
+        <div class="content">
+            <div id="message"></div>
+
+            <div class="form-group">
+                <label for="examName">Exam Name <span class="required">*</span></label>
+                <input type="text" id="examName" placeholder="Enter the name of your exam" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gradeLevel">Grade <span class="optional">(optional)</span></label>
+                <input type="text" id="gradeLevel" placeholder="e.g., 12th Grade, Undergraduate, etc.">
+            </div>
+
+            <div class="form-group">
+                <label for="stream">Stream <span class="optional">(optional)</span></label>
+                <input type="text" id="stream" placeholder="e.g., Science, Engineering, Medical, etc.">
+            </div>
+
+            <button class="btn" onclick="validateExam()" id="validateBtn">
+                <span id="btnText">Validate Exam</span>
+            </button>
+
+            <div class="subjects-container" id="subjectsContainer">
+                <div class="subjects-title">Available Subjects</div>
+                <div class="subjects-grid" id="subjectsGrid"></div>
+                <button class="btn" onclick="completeSetup()" id="completeBtn" style="display: none;">
+                    <span id="completeBtnText">Complete Setup</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let examData = {};
+        let selectedSubjects = [];
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/auth.html';
+                return;
+            }
+        }
+
+        // Show message
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+        // Set loading state
+        function setLoading(loading) {
+            const btn = document.getElementById('validateBtn');
+            const btnText = document.getElementById('btnText');
+            
+            if (loading) {
+                btn.disabled = true;
+                btnText.innerHTML = '<span class="loading"></span>Validating...';
+            } else {
+                btn.disabled = false;
+                btnText.textContent = 'Validate Exam';
+            }
+        }
+
+        // Validate exam with OpenAI
+        async function validateExam() {
+            const examName = document.getElementById('examName').value.trim();
+            const gradeLevel = document.getElementById('gradeLevel').value;
+            const stream = document.getElementById('stream').value;
+
+            if (!examName) {
+                showMessage('Please enter an exam name', 'error');
+                return;
+            }
+
+            setLoading(true);
+            showMessage('Validating exam and fetching subjects...', 'info');
+
+            try {
+                const response = await fetch('/auth/onboarding/validate-exam-openai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify({
+                        examName: examName,
+                        gradeLevel: gradeLevel,
+                        stream: stream
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.isValid && data.subjects && data.subjects.length > 0) {
+                        // Exam is valid and subjects found
+                        examData = {
+                            examName: examName,
+                            gradeLevel: gradeLevel,
+                            stream: stream,
+                            subjects: data.subjects,
+                            examInfo: data.examInfo || {}
+                        };
+                        
+                        showMessage('Exam validated successfully! Select your subjects below.', 'success');
+                        displaySubjects(data.subjects);
+                    } else {
+                        // No matching exam found
+                        showMessage('We don\'t have enough data or there\'s no available information to analyze your exam.', 'error');
+                        document.getElementById('subjectsContainer').style.display = 'none';
+                    }
+                } else {
+                    const errorData = await response.json();
+                    showMessage(errorData.error || 'Failed to validate exam. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error validating exam:', error);
+                showMessage('Network error. Please try again.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Display subjects
+        function displaySubjects(subjects) {
+            const container = document.getElementById('subjectsContainer');
+            const grid = document.getElementById('subjectsGrid');
+            
+            const subjectsHTML = subjects.map(subject => {
+                const isMandatory = subject.type === 'mandatory' || subject.mandatory;
+                const subjectClass = isMandatory ? 'mandatory' : 'optional';
+                const subjectType = isMandatory ? 'Mandatory' : 'Optional';
+                
+                return `
+                    <div class="subject-card ${subjectClass}" onclick="toggleSubject(this, '${subject.name}')" data-subject="${subject.name}">
+                        <div class="subject-name">${subject.name}</div>
+                        <div class="subject-type">${subjectType}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            grid.innerHTML = subjectsHTML;
+            container.style.display = 'block';
+        }
+
+        // Toggle subject selection
+        function toggleSubject(element, subjectName) {
+            const isMandatory = element.classList.contains('mandatory');
+            
+            if (isMandatory) {
+                // Mandatory subjects are always selected
+                return;
+            }
+            
+            element.classList.toggle('selected');
+            
+            if (element.classList.contains('selected')) {
+                if (!selectedSubjects.includes(subjectName)) {
+                    selectedSubjects.push(subjectName);
+                }
+            } else {
+                const index = selectedSubjects.indexOf(subjectName);
+                if (index > -1) {
+                    selectedSubjects.splice(index, 1);
+                }
+            }
+            
+            updateCompleteButton();
+        }
+
+        // Update complete button visibility
+        function updateCompleteButton() {
+            const completeBtn = document.getElementById('completeBtn');
+            if (examData.subjects && examData.subjects.length > 0) {
+                completeBtn.style.display = 'block';
+            }
+        }
+
+        // Complete setup
+        async function completeSetup() {
+            const completeBtn = document.getElementById('completeBtn');
+            const completeBtnText = document.getElementById('completeBtnText');
+            
+            completeBtn.disabled = true;
+            completeBtnText.innerHTML = '<span class="loading"></span>Setting up...';
+
+            try {
+                // Organize subjects into mandatory and optional
+                const mandatorySubjects = examData.subjects.filter(subject => 
+                    subject.type === 'mandatory'
+                );
+                const optionalSubjects = examData.subjects.filter(subject => 
+                    subject.type === 'optional'
+                );
+                
+                // Create the final exam data structure
+                const finalExamData = {
+                    examName: examData.examName,
+                    gradeLevel: examData.gradeLevel,
+                    stream: examData.stream,
+                    examInfo: examData.examInfo,
+                    subjects: {
+                        mandatorySubjects: mandatorySubjects,
+                        optionalSubjects: optionalSubjects,
+                        selectedOptionalSubjects: selectedSubjects
+                    },
+                    onboardingCompleted: true,
+                    completedAt: new Date().toISOString()
+                };
+                
+                // Store in localStorage
+                localStorage.setItem('examData', JSON.stringify(finalExamData));
+                localStorage.setItem('onboardingCompleted', 'true');
+
+                showMessage('Setup completed successfully! Redirecting to dashboard...', 'success');
+
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 2000);
+
+            } catch (error) {
+                showMessage('Error completing setup. Please try again.', 'error');
+                completeBtn.disabled = false;
+                completeBtnText.textContent = 'Complete Setup';
+            }
+        }
+
+        // Initialize
+        checkAuth();
+
+        // Add enter key support
+        document.getElementById('examName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                validateExam();
+            }
+        });
+    </script>
+</body>
+</html> 

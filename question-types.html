@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Types Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-logo i {
+            color: #3498db;
+        }
+        
+        .sidebar-subtitle {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-section-title {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+            color: white;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item-text {
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+        
+        .nav-menu {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .nav-logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-items {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-item i {
+            font-size: 0.9rem;
+        }
+        
+        .question-types-container {
+            background: #fefefe;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .question-types-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 20%, #f1c40f 40%, #27ae60 60%, #3498db 80%, #9b59b6 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .question-types-header {
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .question-types-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .question-types-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .question-types-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question-types-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .question-types-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: middle;
+        }
+        
+        .question-types-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .question-type-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .percentage-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .percentage-bar {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .percentage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .percentage-text {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .action-btn i {
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .rank-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 40px 30px 40px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .breadcrumb::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            z-index: -1;
+        }
+        
+        .breadcrumb-item {
+            color: #5a6c7d;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .breadcrumb-item:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .breadcrumb-item.active {
+            color: #2c3e50;
+            font-weight: 700;
+            background: rgba(44, 62, 80, 0.1);
+        }
+        
+        .breadcrumb-separator {
+            color: #bdc3c7;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .question-types-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-fire"></i>
+                Exam AI
+            </div>
+            <div class="sidebar-subtitle">AI-Powered Exam Analysis</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Analysis Tools</div>
+                <a href="/heatmap.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="menu-item-text">Syllabus Heatmap</span>
+                </a>
+                <a href="/visual-analyzer.html" class="menu-item">
+                    <i class="fas fa-microscope"></i>
+                    <span class="menu-item-text">Visual Analyzer</span>
+                </a>
+                <a href="/question-predictor.html" class="menu-item">
+                    <i class="fas fa-crystal-ball"></i>
+                    <span class="menu-item-text">Question Predictor</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-trophy"></i>
+                    <span class="menu-item-text">Easy Score</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Learning Tools</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span class="menu-item-text">Easy Learn</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="menu-item-text">Quick Notes</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">AI Assistance</div>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="menu-item-text">AI Feedback Engine</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-text">Ask Doubt AI</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Breadcrumb -->
+        <div id="breadcrumb" class="breadcrumb">
+            <a href="/" class="breadcrumb-item">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <a href="/heatmap.html" class="breadcrumb-item">
+                <i class="fas fa-chart-line"></i>
+                Syllabus Heatmap
+            </a>
+            <span class="breadcrumb-separator">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+            <span class="breadcrumb-item active">
+                <i class="fas fa-list"></i>
+                Question Types
+            </span>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <h3>Analyzing Question Types...</h3>
+            <p>Generating detailed question type analysis based on historical patterns</p>
+        </div>
+
+        <!-- Error Section -->
+        <div id="errorSection" class="error hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Question Types Table Section -->
+        <div id="questionTypesSection" class="question-types-container hidden">
+            <div class="question-types-header">
+                <h2 class="question-types-title" id="questionTypesTitle">Question Types Analysis</h2>
+                <p class="question-types-subtitle" id="questionTypesSubtitle">Detailed frequency analysis of question types</p>
+            </div>
+            
+            <table class="question-types-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Rank</th>
+                        <th style="width: 35%;">Question Type</th>
+                        <th style="width: 25%;">Frequency (%)</th>
+                        <th style="width: 30%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="questionTypesTableBody">
+                    <!-- Question types data will be generated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="question-types.js"></script>
+</body>
+</html> 
