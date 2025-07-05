@@ -663,7 +663,7 @@
             }
 
             try {
-                const response = await fetch('/auth/profile', {
+                const response = await fetch(window.getApiUrl('/auth/profile'), {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -712,7 +712,7 @@
             }
 
             try {
-                const response = await fetch('/auth/change-password', {
+                const response = await fetch(window.getApiUrl('/auth/change-password'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -737,7 +737,7 @@
         // Resend verification
         async function resendVerification() {
             try {
-                const response = await fetch('/auth/resend-verification', {
+                const response = await fetch(window.getApiUrl('/auth/resend-verification'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -768,7 +768,7 @@
             if (!password) return;
 
             try {
-                const response = await fetch('/auth/delete-account', {
+                const response = await fetch(window.getApiUrl('/auth/delete-account'), {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

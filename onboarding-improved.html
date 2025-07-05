@@ -6,6 +6,7 @@
     <title>Onboarding - Exam Pattern Analyzer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="js/config.js"></script>
     <style>
         * {
             margin: 0;
@@ -515,7 +516,7 @@
 
             try {
                 // First try to get exam info from server
-                const response = await fetch('/auth/onboarding/validate-exam', {
+                const response = await fetch(window.getApiUrl('/auth/onboarding/validate-exam'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -589,7 +590,7 @@
                     await loadFallbackSubjects();
                 } else {
                     // Try to get subjects from server
-                    const response = await fetch('/auth/onboarding/get-comprehensive-subjects', {
+                    const response = await fetch(window.getApiUrl('/auth/onboarding/get-comprehensive-subjects'), {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -732,7 +733,7 @@
                 
                 // Try to save to server (optional)
                 try {
-                    const response = await fetch('/auth/onboarding/complete', {
+                    const response = await fetch(window.getApiUrl('/auth/onboarding/complete'), {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

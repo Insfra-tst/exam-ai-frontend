@@ -771,7 +771,7 @@
                 }
 
                 console.log('Attempting to fetch subjects from server...');
-                const response = await fetch('/auth/all-available-subjects', {
+                const response = await fetch(window.getApiUrl('/auth/all-available-subjects'), {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                     }
@@ -1177,7 +1177,7 @@
                 const selectedOptionalSubjects = userSubjects.optional.map(s => s.name);
                 
                 // Update backend
-                const response = await fetch('/auth/update-user-subjects', {
+                const response = await fetch(window.getApiUrl('/auth/update-user-subjects'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1256,7 +1256,7 @@
                     const selectedOptionalSubjects = userSubjects.optional.map(s => s.name);
                     
                     // Update backend
-                    const response = await fetch('/auth/update-user-subjects', {
+                    const response = await fetch(window.getApiUrl('/auth/update-user-subjects'), {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
