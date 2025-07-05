@@ -322,7 +322,7 @@
             showMessage('Validating exam and fetching subjects...', 'info');
 
             try {
-                const response = await fetch('/auth/onboarding/validate-exam-openai', {
+                const response = await fetch(window.getApiUrl('/auth/onboarding/validate-exam-openai'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

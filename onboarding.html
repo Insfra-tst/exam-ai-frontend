@@ -288,7 +288,7 @@
         async function checkServerExamData() {
             try {
                 console.log('Checking server for existing exam data...');
-                const response = await fetch('/auth/me', {
+                const response = await fetch(window.getApiUrl('/auth/me'), {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                     }
@@ -365,7 +365,7 @@
             showMessage('Validating exam and fetching subjects...', 'info');
 
             try {
-                const response = await fetch('/auth/onboarding/validate-exam-openai', {
+                const response = await fetch(window.getApiUrl('/auth/onboarding/validate-exam-openai'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -486,7 +486,7 @@
                 };
                 
                 // Save to server
-                const response = await fetch('/auth/onboarding/complete', {
+                const response = await fetch(window.getApiUrl('/auth/onboarding/complete'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
