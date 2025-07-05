@@ -24,7 +24,7 @@
             const examData = localStorage.getItem('examData');
             if (!examData) {
                 // Try to get from server
-                fetch('/auth/user', {
+                fetch(window.getApiUrl('/auth/user'), {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

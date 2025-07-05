@@ -422,7 +422,7 @@
         // Load user data
         async function loadUserData() {
             try {
-                const response = await fetch('/auth/user', {
+                const response = await fetch(window.getApiUrl('/auth/user'), {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                     }
@@ -488,7 +488,7 @@
         // Generate heatmap data using OpenAI
         async function generateHeatmapData() {
             try {
-                const response = await fetch('/auth/generate-subject-analysis', {
+                const response = await fetch(window.getApiUrl('/auth/generate-subject-analysis'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
